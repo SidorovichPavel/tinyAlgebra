@@ -8,15 +8,43 @@
     <Filter Include="src\Camera">
       <UniqueIdentifier>{b48b96c9-d1f3-4675-bfef-4646e76b02f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Math">
+      <UniqueIdentifier>{a2a135f1-75d8-4a4a-a6a0-35ac9c2516b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\MarchingCubes">
+      <UniqueIdentifier>{e30a740a-85e8-4a54-ac11-b798742d4568}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera\Camera.cpp">
       <Filter>src\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="src\math\Vector.cpp">
+      <Filter>src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MarchingCubes\MarchingCubes.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Camera\Camera.h">
+    <ClInclude Include="src\Camera\Camera.hpp">
       <Filter>src\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="src\math\math.hpp">
+      <Filter>src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\Matrix.hpp">
+      <Filter>src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\Vector.hpp">
+      <Filter>src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\type_decl.hpp">
+      <Filter>src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\Utility.hpp">
+      <Filter>src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MarchingCubes\MarchingCubes.hpp" />
   </ItemGroup>
 </Project>

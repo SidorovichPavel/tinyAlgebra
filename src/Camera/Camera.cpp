@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "Camera.hpp"
 #include "../glm/ext.hpp"
 #include "../glm/matrix.hpp"
 
@@ -8,8 +8,8 @@ namespace ta
 	Camera::Camera(const glm::vec3 _Pos, const glm::vec3 _Target, glm::vec3 _Up, const float _Aspect, const float _Fovy)
 		:
 		mPosition(_Pos),
-		mDirection(glm::normalize(_Target - _Pos)),
-		mUp(_Up),
+		mDirection(_Target - _Pos),
+		mUp(normalize(_Up)),
 		mAspect(_Aspect),
 		mFovy(_Fovy),
 		mRotate(glm::mat4(1.f)),
@@ -19,8 +19,10 @@ namespace ta
 		useQuaternions(false)
 	{
 		mRight = cross(mDirection, mUp);
-		//mYaw = acosf(mDirection[0]);
-		//mPitch = acosf(mDirection[1]);
+		
+		mStartDirection = mDirection;
+		mStartUp = mUp;
+		mStartRight = mRight;
 	}
 
 	Camera::~Camera()
@@ -43,9 +45,9 @@ namespace ta
 		mFovy = _Angle;
 	}
 
-	glm::mat4 Camera::get_perspective() const noexcept
+	glm::mat4 Camera::get_perspective(float _Near, float _Far) const noexcept
 	{
-		return glm::perspective(mFovy, mAspect, 0.1f, 300.f);
+		return glm::perspective(mFovy, mAspect, _Near, _Far);
 	}
 
 	glm::mat4 Camera::get_view() const noexcept
@@ -55,9 +57,9 @@ namespace ta
 			mUp);
 	}
 
-	glm::mat4 Camera::get_mat4() const noexcept
+	glm::mat4 Camera::get_mat4(float _Near, float _Far) const noexcept
 	{
-		return get_perspective() * get_view();
+		return get_perspective(_Near, _Far) * get_view();
 	}
 
 	glm::vec3 Camera::get_direction() const noexcept
@@ -100,9 +102,9 @@ namespace ta
 
 	void Camera::update_vertors() noexcept
 	{
-		mDirection = glm::vec3(mRotate * glm::vec4({ 0.f, 0.f, -1.f, 1.f }));
-		mRight = glm::vec3(mRotate * glm::vec4({ 1.f, 0.f, 0.f, 1.f }));
-		mUp = glm::vec3(mRotate * glm::vec4({ 0.f, 1.f, 0.f, 1.f }));
+		mDirection = glm::vec3(mRotate * glm::vec4(mStartDirection, 1.f));
+		mRight = glm::vec3(mRotate * glm::vec4(mStartRight, 1.f));
+		mUp = glm::vec3(mRotate * glm::vec4(mStartUp, 1.f));
 	}
 
 	//angle pls in radians
@@ -111,9 +113,9 @@ namespace ta
 		mPitch += _Pitch; mYaw += _Yaw; mRoll += _Roll;
 		mRotate = glm::mat4(1.f);
 
-		mRotate = glm::rotate(mRotate, mRoll, glm::vec3({ 0.f, 0.f, 1.f }));
-		mRotate = glm::rotate(mRotate, mYaw, glm::vec3({ 0.f, 1.f, 0.f }));
-		mRotate = glm::rotate(mRotate, mPitch, glm::vec3({ 1.f, 0.f, 0.f }));
+		mRotate = glm::rotate(mRotate, mRoll, mStartDirection);
+		mRotate = glm::rotate(mRotate, mYaw, mStartUp);
+		mRotate = glm::rotate(mRotate, mPitch, mStartRight);
 		update_vertors();
 	}
 

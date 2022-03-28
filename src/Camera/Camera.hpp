@@ -10,6 +10,9 @@ namespace ta
 		glm::vec3 mDirection;
 		glm::vec3 mUp;
 		glm::vec3 mRight;
+		glm::vec3 mStartDirection;
+		glm::vec3 mStartUp;
+		glm::vec3 mStartRight;
 		float mAspect{};
 		float mFovy{};
 
@@ -33,9 +36,9 @@ namespace ta
 
 		void set_fovy(float _Angle) noexcept;
 
-		glm::mat4 get_perspective() const noexcept;
+		glm::mat4 get_perspective(float _Near, float _Far) const noexcept;
 		glm::mat4 get_view()const noexcept;
-		glm::mat4 get_mat4() const noexcept;
+		glm::mat4 get_mat4(float _Near, float _Far) const noexcept;
 		glm::vec3 get_direction() const noexcept;
 		glm::vec3 get_right() const noexcept;
 		glm::vec3 get_up() const noexcept;
