@@ -8,7 +8,7 @@ namespace ta
 	Camera::Camera(const glm::vec3 _Pos, const glm::vec3 _Target, glm::vec3 _Up, const float _Aspect, const float _Fovy)
 		:
 		mPosition(_Pos),
-		mDirection(_Target - _Pos),
+		mDirection(normalize(_Target - _Pos)),
 		mUp(normalize(_Up)),
 		mAspect(_Aspect),
 		mFovy(_Fovy),
@@ -47,7 +47,7 @@ namespace ta
 
 	glm::mat4 Camera::get_perspective(float _Near, float _Far) const noexcept
 	{
-		return glm::perspective(mFovy, mAspect, _Near, _Far);
+		return glm::perspective(glm::radians(mFovy), mAspect, _Near, _Far);
 	}
 
 	glm::mat4 Camera::get_view() const noexcept
@@ -85,11 +85,11 @@ namespace ta
 	void Camera::update_Fovy(uint16_t _Keys, int16_t _Delta, int32_t x, int32_t y) noexcept
 	{
 		if (_Delta > 0)
-			if ((mFovy - 44.5f) > std::numeric_limits<float>::epsilon())
-				mFovy -= 0.1f;
+			if (mFovy > 30.f)
+				mFovy -= 5.f;
 		if (_Delta < 0)
-			if ((45.5f - mFovy) > std::numeric_limits<float>::epsilon())
-				mFovy += 0.1f;
+			if (mFovy < 70.f)
+				mFovy += 5.f;
 	}
 
 	void Camera::update_aspect(uint16_t x, uint16_t y)noexcept
