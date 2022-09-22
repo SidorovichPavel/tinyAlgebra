@@ -106,21 +106,30 @@ namespace ta
 
 
 
-	Octree::Octree(const glm::vec3& _PR, const glm::vec3& _Size) noexcept
+	GeneratingOctree::GeneratingOctree(const glm::vec3& _PR, const glm::vec3& _Size, sdf_t&& _SDF) noexcept
 		:
 		mSpace(nullptr),
-		mEdgesSize(_Size)
+		mEdgesSize(_Size),
+		mSDF(_SDF)
 	{
-		auto half_size = _Size / 2.f;
+		auto half_size = abs(_Size) / 2.f;
 		mSpace = new(std::nothrow) Node(_PR - half_size, _PR + half_size, nullptr);
 	}
 
-	Octree::~Octree() noexcept
+	GeneratingOctree::~GeneratingOctree() noexcept
 	{
 		delete mSpace;
 	}
 
-	float Octree::get_vertices_weight(BoundingBox& box, sdf_t& sdf)
+	float GeneratingOctree::operator()(const glm::vec3& p) noexcept
+	{
+		if (mSDF)
+			return mSDF(p);
+		else
+			return std::numeric_limits<float>::infinity();
+	}
+
+	float GeneratingOctree::get_vertices_weight(BoundingBox& box, sdf_t& sdf)
 	{
 		constexpr float max_vertices_weight = 8.f;
 		float result = 0.f;
@@ -131,7 +140,7 @@ namespace ta
 		return std::max(result, max_vertices_weight - result);
 	}
 
-	void Octree::generate(glm::vec3 _MinGridSize, sdf_t&& sdf)
+	void GeneratingOctree::generate(glm::vec3 _MinGridSize)
 	{
 		if (!mSpace)
 			return;
@@ -160,7 +169,7 @@ namespace ta
 			{
 				auto offset = size * BoundingBox::offsets[i];
 				BoundingBox box(lo_bound + offset, point_region + offset);
-				if (get_vertices_weight(box, sdf) != 8.f)
+				if (get_vertices_weight(box, mSDF) != 8.f)
 				{
 					(*node)[i] = new Node(box, node);	// child[i]
 					(*node).increase_visitable();
@@ -170,7 +179,7 @@ namespace ta
 		}
 	}
 
-	Node::ptr_t Octree::get_root()
+	Node::ptr_t GeneratingOctree::get_root()
 	{
 		return mSpace;
 	}

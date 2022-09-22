@@ -62,7 +62,7 @@ namespace ta
 		Vector<T, 2> _get()
 		{
 			static_assert((Idx0 < Dim) && (Idx1 < Dim), "Invalidate swizzle arguments. Out of range");
-			return Vector<T, 2>{mData[Idx0], mData[Idx1]};
+			return Vector<T, 2>({ mData[Idx0], mData[Idx1] });
 		};
 		template<size_t Idx0, size_t Idx1, size_t Idx2>
 		Vector<T, 3> _get()
@@ -279,7 +279,7 @@ namespace ta
 				return _get<I...>();
 			else
 			{
-				static_assert(false, "Swizzle operator cano't ba called. Invalidate argument package size");
+				static_assert(sizeof...(I) >= 2 && sizeof...(I) <= 4, "Swizzle operator cano't ba called. Invalidate argument package size");
 				return Vector<T, 0>();
 			}
 		}

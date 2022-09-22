@@ -152,10 +152,9 @@ auto find(std::vector<glm::vec3>& _Range, const glm::vec3& _Val)
 	return std::numeric_limits<size_t>::max();
 }
 
-auto march_cubes(Octree& _SpaceTree, float(*_Fn)(glm::vec3 v))
+auto march_cubes(GeneratingOctree& _SpaceTree)
 -> std::tuple<std::vector<::glm::vec3>, std::vector<::glm::vec3>, std::vector<uint32_t>>
 {
-	std::function<float(glm::vec3)> sdf(_Fn);
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
 	std::vector<uint32_t> indices;
@@ -174,7 +173,7 @@ auto march_cubes(Octree& _SpaceTree, float(*_Fn)(glm::vec3 v))
 		for (auto& offset : numeric::VertexOffset)
 		{
 			auto p = l + offset * size;
-			auto grid_vert_val = sdf(p);
+			auto grid_vert_val = _SpaceTree(p);
 			if (grid_vert_val < 0.f)
 				cube_index |= 1 << counter;
 			counter++;
@@ -186,7 +185,7 @@ auto march_cubes(Octree& _SpaceTree, float(*_Fn)(glm::vec3 v))
 				auto [v1, v2] = numeric::EdgeConnection[i];
 				auto v1_pos = l + numeric::VertexOffset[v1] * size,
 					v2_pos = l + numeric::VertexOffset[v2] * size;
-				vert_list[i] = interpolation(v1_pos, v2_pos, _Fn(v1_pos), _Fn(v2_pos));
+				vert_list[i] = interpolation(v1_pos, v2_pos, _SpaceTree(v1_pos), _SpaceTree(v2_pos));
 			}
 
 		for (auto vidx = std::begin(numeric::TriangleConnectionTable[cube_index]);
@@ -204,7 +203,7 @@ auto march_cubes(Octree& _SpaceTree, float(*_Fn)(glm::vec3 v))
 				{
 					rindices.push_back(static_cast<uint32_t>(vertices.size()));
 					vertices.push_back(v);
-					normals.push_back(gradient(v, sdf));
+					normals.push_back(gradient(v, _SpaceTree));
 				}
 			}
 			indices.insert(indices.end(), rindices.rbegin(), rindices.rend());

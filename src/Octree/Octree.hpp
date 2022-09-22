@@ -46,15 +46,17 @@ namespace ta
 		uint32_t mVisitable;
 	};
 
-	class Octree
+	class GeneratingOctree
 	{
 	public:
 		using sdf_t = std::function<float(glm::vec3)>;
 
-		Octree(const glm::vec3& _PR, const glm::vec3& _Size) noexcept;
-		~Octree() noexcept;
+		GeneratingOctree(const glm::vec3& _PR, const glm::vec3& _Size, sdf_t&& _SDF) noexcept;
+		~GeneratingOctree() noexcept;
 
-		void generate(glm::vec3 _MinGridSize, sdf_t&& sdf);
+		float operator()(const glm::vec3& p) noexcept;
+
+		void generate(glm::vec3 _MinGridSize);
 
 		Node::ptr_t get_root();
 
@@ -65,6 +67,7 @@ namespace ta
 		constexpr static uint8_t SubBoxNumber = 8;
 		glm::vec3 mEdgesSize;
 		Node::ptr_t mSpace;
+		std::function<float(glm::vec3)> mSDF;
 	};
 
 
