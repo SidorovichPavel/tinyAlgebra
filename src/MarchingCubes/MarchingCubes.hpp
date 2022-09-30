@@ -12,7 +12,7 @@
 
 TA_MARCHING_CUBES_BEGIN
 
-auto generate_cubes(::glm::vec3 _Pos, ::glm::vec3 _Size, float _Scale)
+auto generate_cubes(::glm::vec3 _Pos, ::glm::vec3 _Size, float _Step)
 ->std::pair<std::vector<::glm::vec3>, std::vector<uint32_t>>;
 
 auto march_cubes(::glm::vec3 _Pos, ::glm::vec3 _Size, float _Step, float _IsoLvl, float(*_Fn)(::glm::vec3 v))
