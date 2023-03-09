@@ -109,7 +109,7 @@ namespace ta
 
 		}
 
-		static constexpr size_t dimention() noexcept
+		static constexpr size_t size() noexcept
 		{
 			return Dim;
 		}
