@@ -1,7 +1,6 @@
 #pragma once
 
 #include "type_decl.hpp"
-#include "..\glm\glm.hpp"
 #include <limits>
 
 namespace ta

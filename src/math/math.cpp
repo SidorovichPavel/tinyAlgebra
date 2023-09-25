@@ -1,4 +1,4 @@
-#include "math.hpp"
+#include <tinyalgebralib/math/math.hpp>
 
 namespace ta
 {

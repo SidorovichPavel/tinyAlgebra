@@ -1,7 +1,6 @@
 #pragma once
 
 #include <type_traits>
-#include <xutility>
 
 namespace ta::detail
 {
@@ -24,7 +23,13 @@ namespace ta::detail
 		static constexpr bool value = std::is_same_v<T, U> && is_same_pack<T, Args...>::value;
 	};
 
+	template<class T, class... Args>
+	bool is_same_pack_v = is_same_pack<T, Args...>::value;
+
 	template<class T, class U>
 	auto declval_by_mul() noexcept -> 
 		decltype(std::declval<T>() * std::declval<U>());
+
+	template<class T, class U>
+	using decltype_by_mul = decltype(declval_by_mul<T, U>());
 }

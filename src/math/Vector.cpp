@@ -1,4 +1,4 @@
-#include "Vector.hpp"
+#include <tinyalgebralib/math/Vector.hpp>
 
 #include <immintrin.h>
 #include <xmmintrin.h>

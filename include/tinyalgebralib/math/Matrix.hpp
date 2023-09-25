@@ -71,17 +71,17 @@ namespace ta
 
 		row_type& operator[] (size_t _Idx)
 		{
-			assert(_Idx < M);
+			//assert(_Idx < M, "");
 			return mData[_Idx];
 		}
 		row_type operator[] (size_t _Idx) const
 		{
-			assert(_Idx < M);
+			//assert(_Idx < M, "");
 			return mData[_Idx];
 		}
 		value_ref_type at(size_t _IdxI, size_t _IdxJ)
 		{
-			assert(_IdxI < M&& _IdxJ < N);
+			//assert((_IdxI < M)&& (_IdxJ < N), "");
 			return mData[_IdxI][_IdxJ];
 		}
 		
