@@ -1,5 +1,10 @@
-## Building folder
-/build
+# Build folders
+build/
 
-## VS-Code configs
-/.vscode
+# CMake
+CMakeCache.txt
+
+# IDEs
+.idea/
+.vs/
+.vscode/
