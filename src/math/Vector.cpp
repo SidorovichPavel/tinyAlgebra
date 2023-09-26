@@ -1,8 +1,8 @@
-#include <tinyalgebralib/math/Vector.hpp>
-
 #include <immintrin.h>
 #include <xmmintrin.h>
 #include <emmintrin.h>
+
+#include <tinyalgebralib/math/Vector.hpp>
 
 namespace ta
 {
@@ -25,6 +25,5 @@ namespace ta
 		_mm_storeu_ps(result.data(), res);
 		return result;
 	}
-
 
 }

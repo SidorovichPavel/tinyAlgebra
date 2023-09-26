@@ -22,7 +22,7 @@ namespace ta
 	class Vector
 	{
 		static_assert(Dim > 1, "Invalidate Dimention");
-		// static_assert(std::is_arithmetic_v<T>, "Invaludate type");
+		static_assert(std::is_arithmetic_v<T>, "Invaludate type");
 
 	public:
 		using value_type = T;
@@ -73,9 +73,9 @@ namespace ta
 		{
 			std::copy(init_list.begin(), init_list.end(), data_);
 		}
-		Vector(Vector<T, (Dim - 1)> &_Vec, T _Val)
+		Vector(Vector<T, (Dim - 1)> &vec, T _Val)
 		{
-			auto [other_begin, other_end] = _Vec._get_range();
+			auto [other_begin, other_end] = vec._get_range();
 			std::copy(other_begin, other_end, data_);
 			data_[Dim - 1] = _Val;
 		}
@@ -83,7 +83,7 @@ namespace ta
 		Vector(Args&&... args)
 		{
 			static_assert(sizeof...(Args) <= Dim, "Too many indices for construct");
-			static_assert(detail::is_same_pack<T, Args...>::value, "Incorrect arguments type");
+			static_assert(detail::is_same_pack<T, std::remove_reference_t<Args>...>::value, "Incorrect arguments type");
 
 			size_t idx=0;
 			(((*this)[idx++] = args), ...);
@@ -112,20 +112,20 @@ namespace ta
 			return *this;
 		}
 
-		value_ref_type operator[](size_t _Idx)
+		value_ref_type operator[](size_t idx)
 		{
-			return data_[_Idx];
+			return data_[idx];
 		}
 
-		value_type operator[](size_t _Idx) const
+		value_type operator[](size_t idx) const
 		{
-			return data_[_Idx];
+			return data_[idx];
 		}
 
 		template <class U>
-		this_type &operator+=(const Vector<U, Dim> &_Right) noexcept
+		this_type &operator+=(const Vector<U, Dim> &right) noexcept
 		{
-			auto [right_begin, right_end] = _Right._get_range();
+			auto [right_begin, right_end] = right._get_range();
 			auto [begin, end] = _get_range();
 			std::transform(right_begin, right_end, begin, begin,
 						   [](auto a, auto b)
@@ -134,9 +134,9 @@ namespace ta
 		}
 
 		template <class U>
-		this_type &operator-=(const Vector<U, Dim> &_Right) noexcept
+		this_type &operator-=(const Vector<U, Dim> &right) noexcept
 		{
-			auto [right_begin, right_end] = _Right._get_range();
+			auto [right_begin, right_end] = right._get_range();
 			auto [begin, end] = _get_range();
 			std::transform(right_begin, right_end, begin, begin,
 						   [](auto a, auto b)
@@ -295,30 +295,30 @@ namespace ta
 	Vector<float, 4> operator-(const Vector<float, 4> &_V, const Vector<float, 4> &_U) noexcept;
 
 	template <class T, class U, size_t Dim>
-	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(const Vector<T, Dim> &_Vec, U _Val) noexcept
+	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(const Vector<T, Dim> &vec, U _Val) noexcept
 	{
-		return _Vec.transform_to_new([_Val](auto e)
+		return vec.transform_to_new([_Val](auto e)
 									 { return static_cast<T>(_Val * e); });
 	}
 
 	template <class T, class U, size_t Dim>
-	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(const Vector<T, Dim> &_Vec, U _Val) noexcept
+	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(const Vector<T, Dim> &vec, U _Val) noexcept
 	{
-		return _Vec.transform_to_new([_Val](auto e)
+		return vec.transform_to_new([_Val](auto e)
 									 { return static_cast<T>(e / _Val); });
 	}
 
 	template <class T, class U, size_t Dim>
-	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(U _Val, const Vector<T, Dim> &_Vec) noexcept
+	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(U _Val, const Vector<T, Dim> &vec) noexcept
 	{
-		return _Vec.transform_to_new([_Val](auto e)
+		return vec.transform_to_new([_Val](auto e)
 									 { return static_cast<T>(_Val * e); });
 	}
 
 	template <class T, class U, size_t Dim>
-	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(U _Val, const Vector<T, Dim> &_Vec) noexcept
+	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(U _Val, const Vector<T, Dim> &vec) noexcept
 	{
-		return _Vec.transform_to_new([_Val](auto e)
+		return vec.transform_to_new([_Val](auto e)
 									 { return static_cast<T>(_Val / e); });
 	}
 };
