@@ -2,6 +2,7 @@
 
 #include "type_decl.hpp"
 #include <limits>
+#include <numeric>
 
 namespace ta
 {
@@ -18,5 +19,11 @@ namespace ta
 	mat4 operator*(const mat4 &A, const mat4 &B) noexcept;
 
 	vec4 operator*(const mat4 &mat, const vec4 &vec) noexcept;
+	vec4 operator*(const vec4& vec, const mat4& mat) noexcept;
+	
+	mat4 look_at(vec3 pos, vec3 target, vec3 up) noexcept;
 
+	mat4 perspective(float fovy, float aspect, float near, float far) noexcept;
+
+	float rad(float deg) noexcept;
 }
