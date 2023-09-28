@@ -13,8 +13,15 @@ namespace ta
 		return vec * rlen;
 	}
 
-	template <class T, class U>
-	auto cross(const Vector<T, 3> &_V, const Vector<U, 3> &_U) noexcept -> Vector<detail::decltype_by_mul<T, U>, 3>;
+	template <class U, class V>
+	auto cross(const Vector<U, 3> &u, const Vector<V, 3> &v) noexcept -> Vector<decltype(detail::declval_by_mul<U, V>()), 3>
+	{
+		using return_type = detail::decltype_by_mul<U, V>;
+		return Vector<return_type, 3>{
+			u.y() * v.z() - u.z() * v.y(),
+			u.z() * v.x() - u.x() * v.z(),
+			u.x() * v.y() - u.y() * v.x()};
+	}
 
 	mat4 operator*(const mat4 &A, const mat4 &B) noexcept;
 

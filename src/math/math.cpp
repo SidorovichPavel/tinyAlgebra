@@ -9,23 +9,12 @@
 
 namespace ta
 {
-
-	template <class V, class U>
-	auto cross(const Vector<V, 3> &v, const Vector<U, 3> &u) noexcept -> Vector<detail::decltype_by_mul<V, U>, 3>
-	{
-		using return_type = decltype(detail::declval_by_mul<V, U>());
-		return Vector<return_type, 3>{
-			v.y() * u.z() - v.z() * u.y(),
-			v.z() * u.x() - v.x() * u.z(),
-			v.x() * u.y() - v.y() * u.x()};
-	}
-
 	float dot2(const vec3 &v1, const vec3 &v2)
 	{
 		return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() + v2.z();
 	}
 
-	Vector<float, 4> operator+(const Vector<float, 4>& _V, const Vector<float, 4>& _U) noexcept
+	Vector<float, 4> operator+(const Vector<float, 4> &_V, const Vector<float, 4> &_U) noexcept
 	{
 		Vector<float, 4> result;
 		__m128 v = _mm_load_ps(_V.data());
@@ -35,7 +24,7 @@ namespace ta
 		return result;
 	}
 
-	Vector<float, 4> operator-(const Vector<float, 4>& _V, const Vector<float, 4>& _U) noexcept
+	Vector<float, 4> operator-(const Vector<float, 4> &_V, const Vector<float, 4> &_U) noexcept
 	{
 		Vector<float, 4> result;
 		__m128 v = _mm_load_ps(_V.data());
@@ -49,25 +38,33 @@ namespace ta
 	{
 		mat4 result;
 
-		result[0][0] = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0];
-		result[0][1] = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1];
-		result[0][2] = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2];
-		result[0][3] = A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3];
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+			{
+				result[i][j] = A[i][0] * B[0][j] + A[i][1] * B[1][j] + A[i][2] * B[2][j] + A[i][3] * B[3][j];
+			}
+		}
 
-		result[1][0] = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0] + A[1][3] * B[3][0];
-		result[1][1] = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1] + A[1][3] * B[3][1];
-		result[1][2] = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2] + A[1][3] * B[3][2];
-		result[1][3] = A[1][0] * B[0][3] + A[1][1] * B[1][3] + A[1][2] * B[2][3] + A[1][3] * B[3][3];
+		// result[0][0] = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0];
+		// result[0][1] = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1];
+		// result[0][2] = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2];
+		// result[0][3] = A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3];
 
-		result[2][0] = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0] + A[2][3] * B[3][0];
-		result[2][1] = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1] + A[2][3] * B[3][1];
-		result[2][2] = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2] + A[2][3] * B[3][2];
-		result[2][3] = A[2][0] * B[0][3] + A[2][1] * B[1][3] + A[2][2] * B[2][3] + A[2][3] * B[3][3];
+		// result[1][0] = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0] + A[1][3] * B[3][0];
+		// result[1][1] = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1] + A[1][3] * B[3][1];
+		// result[1][2] = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2] + A[1][3] * B[3][2];
+		// result[1][3] = A[1][0] * B[0][3] + A[1][1] * B[1][3] + A[1][2] * B[2][3] + A[1][3] * B[3][3];
 
-		result[3][0] = A[3][0] * B[0][0] + A[3][1] * B[1][0] + A[3][2] * B[2][0] + A[3][3] * B[3][0];
-		result[3][1] = A[3][0] * B[0][1] + A[3][1] * B[1][1] + A[3][2] * B[2][1] + A[3][3] * B[3][1];
-		result[3][2] = A[3][0] * B[0][2] + A[3][1] * B[1][2] + A[3][2] * B[2][2] + A[3][3] * B[3][2];
-		result[3][3] = A[3][0] * B[0][3] + A[3][1] * B[1][3] + A[3][2] * B[2][3] + A[3][3] * B[3][3];
+		// result[2][0] = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0] + A[2][3] * B[3][0];
+		// result[2][1] = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1] + A[2][3] * B[3][1];
+		// result[2][2] = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2] + A[2][3] * B[3][2];
+		// result[2][3] = A[2][0] * B[0][3] + A[2][1] * B[1][3] + A[2][2] * B[2][3] + A[2][3] * B[3][3];
+
+		// result[3][0] = A[3][0] * B[0][0] + A[3][1] * B[1][0] + A[3][2] * B[2][0] + A[3][3] * B[3][0];
+		// result[3][1] = A[3][0] * B[0][1] + A[3][1] * B[1][1] + A[3][2] * B[2][1] + A[3][3] * B[3][1];
+		// result[3][2] = A[3][0] * B[0][2] + A[3][1] * B[1][2] + A[3][2] * B[2][2] + A[3][3] * B[3][2];
+		// result[3][3] = A[3][0] * B[0][3] + A[3][1] * B[1][3] + A[3][2] * B[2][3] + A[3][3] * B[3][3];
 
 		return result;
 	}
@@ -76,10 +73,10 @@ namespace ta
 	{
 		vec4 result;
 
-		result[0] = mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2] + mat[0][3] * vec[3];
-		result[1] = mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2] + mat[1][3] * vec[3];
-		result[2] = mat[2][0] * vec[0] + mat[2][1] * vec[1] + mat[2][2] * vec[2] + mat[2][3] * vec[3];
-		result[3] = mat[3][0] * vec[0] + mat[3][1] * vec[1] + mat[3][2] * vec[2] + mat[3][3] * vec[3];
+		// result[0] = mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2] + mat[0][3] * vec[3];
+		// result[1] = mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2] + mat[1][3] * vec[3];
+		// result[2] = mat[2][0] * vec[0] + mat[2][1] * vec[1] + mat[2][2] * vec[2] + mat[2][3] * vec[3];
+		// result[3] = mat[3][0] * vec[0] + mat[3][1] * vec[1] + mat[3][2] * vec[2] + mat[3][3] * vec[3];
 
 		return result;
 	}
@@ -88,10 +85,15 @@ namespace ta
 	{
 		vec4 result;
 
-		result[0] = vec[0] * mat[0][0] + vec[0] * mat[1][0] + vec[0] * mat[2][0] + vec[0] * mat[3][0];
-		result[1] = vec[1] * mat[0][1] + vec[1] * mat[1][1] + vec[1] * mat[2][1] + vec[1] * mat[3][1];
-		result[2] = vec[2] * mat[0][2] + vec[2] * mat[1][2] + vec[2] * mat[2][0] + vec[2] * mat[3][2];
-		result[3] = vec[3] * mat[0][3] + vec[3] * mat[1][3] + vec[3] * mat[2][3] + vec[3] * mat[3][3];
+		for (int j = 0; j < 4; ++j)
+		{
+			result[j] = vec[j] * mat[0][j] + vec[j] * mat[1][j] + vec[j] * mat[2][j] + vec[j] * mat[3][j];
+		}
+
+		// result[0] = vec[0] * mat[0][0] + vec[0] * mat[1][0] + vec[0] * mat[2][0] + vec[0] * mat[3][0];
+		// result[1] = vec[1] * mat[0][1] + vec[1] * mat[1][1] + vec[1] * mat[2][1] + vec[1] * mat[3][1];
+		// result[2] = vec[2] * mat[0][2] + vec[2] * mat[1][2] + vec[2] * mat[2][0] + vec[2] * mat[3][2];
+		// result[3] = vec[3] * mat[0][3] + vec[3] * mat[1][3] + vec[3] * mat[2][3] + vec[3] * mat[3][3];
 
 		return result;
 	}
