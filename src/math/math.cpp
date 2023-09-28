@@ -38,25 +38,61 @@ namespace ta
 	{
 		mat4 result;
 
-		result[0][0] = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0];
-		result[0][1] = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1];
-		result[0][2] = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2];
-		result[0][3] = A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3];
+		auto b0 = _mm_loadu_ps(B[0].data());
+		auto b1 = _mm_loadu_ps(B[1].data());
+		auto b2 = _mm_loadu_ps(B[2].data());
+		auto b3 = _mm_loadu_ps(B[3].data());
 
-		result[1][0] = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0] + A[1][3] * B[3][0];
-		result[1][1] = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1] + A[1][3] * B[3][1];
-		result[1][2] = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2] + A[1][3] * B[3][2];
-		result[1][3] = A[1][0] * B[0][3] + A[1][1] * B[1][3] + A[1][2] * B[2][3] + A[1][3] * B[3][3];
+		for (int i = 0; i < 4; i++)
+		{
+			__m128 r = _mm_setzero_ps();
 
-		result[2][0] = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0] + A[2][3] * B[3][0];
-		result[2][1] = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1] + A[2][3] * B[3][1];
-		result[2][2] = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2] + A[2][3] * B[3][2];
-		result[2][3] = A[2][0] * B[0][3] + A[2][1] * B[1][3] + A[2][2] * B[2][3] + A[2][3] * B[3][3];
+			auto ai0 = _mm_set1_ps(A[i][0]);
+			auto ai1 = _mm_set1_ps(A[i][1]);
+			auto ai2 = _mm_set1_ps(A[i][2]);
+			auto ai3 = _mm_set1_ps(A[i][3]);
 
-		result[3][0] = A[3][0] * B[0][0] + A[3][1] * B[1][0] + A[3][2] * B[2][0] + A[3][3] * B[3][0];
-		result[3][1] = A[3][0] * B[0][1] + A[3][1] * B[1][1] + A[3][2] * B[2][1] + A[3][3] * B[3][1];
-		result[3][2] = A[3][0] * B[0][2] + A[3][1] * B[1][2] + A[3][2] * B[2][2] + A[3][3] * B[3][2];
-		result[3][3] = A[3][0] * B[0][3] + A[3][1] * B[1][3] + A[3][2] * B[2][3] + A[3][3] * B[3][3];
+			r = _mm_fmadd_ps(ai0, b0, r);
+			r = _mm_fmadd_ps(ai1, b1, r);
+			r = _mm_fmadd_ps(ai2, b2, r);
+			r = _mm_fmadd_ps(ai3, b3, r);
+
+			_mm_storeu_ps(result[i].data(), r);
+		}
+
+		// result[0][0] = A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0];
+		// result[0][1] = A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1];
+		// result[0][2] = A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2];
+		// result[0][3] = A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3];
+
+		// result[1][0] = A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0] + A[1][3] * B[3][0];
+		// result[1][1] = A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1] + A[1][3] * B[3][1];
+		// result[1][2] = A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2] + A[1][3] * B[3][2];
+		// result[1][3] = A[1][0] * B[0][3] + A[1][1] * B[1][3] + A[1][2] * B[2][3] + A[1][3] * B[3][3];
+
+		// result[2][0] = A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0] + A[2][3] * B[3][0];
+		// result[2][1] = A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1] + A[2][3] * B[3][1];
+		// result[2][2] = A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2] + A[2][3] * B[3][2];
+		// result[2][3] = A[2][0] * B[0][3] + A[2][1] * B[1][3] + A[2][2] * B[2][3] + A[2][3] * B[3][3];
+
+		// result[3][0] = A[3][0] * B[0][0] + A[3][1] * B[1][0] + A[3][2] * B[2][0] + A[3][3] * B[3][0];
+		// result[3][1] = A[3][0] * B[0][1] + A[3][1] * B[1][1] + A[3][2] * B[2][1] + A[3][3] * B[3][1];
+		// result[3][2] = A[3][0] * B[0][2] + A[3][1] * B[1][2] + A[3][2] * B[2][2] + A[3][3] * B[3][2];
+		// result[3][3] = A[3][0] * B[0][3] + A[3][1] * B[1][3] + A[3][2] * B[2][3] + A[3][3] * B[3][3];
+
+		return result;
+	}
+
+	mat4 transpose(const mat4 &mat) noexcept
+	{
+		mat4 result;
+
+		for (int i = 0; i < 4; i++)
+			for (int j = i; j < 4; j++)
+			{
+				result[i][j] = mat[j][i];
+				result[j][i] = mat[i][j];
+			}
 
 		return result;
 	}
@@ -77,16 +113,35 @@ namespace ta
 	{
 		vec4 result(0.f);
 
-		for (int j = 0; j < 4; ++j)
-		{
-			for (int k = 0; k < 4; k++)
-				result[j] += vec[k] * mat[k][j];
-		}
+		// for (int j = 0; j < 4; ++j)
+		// {
+		// 	for (int k = 0; k < 4; k++)
+		// 		result[j] += vec[k] * mat[k][j];
+		// }
 
-		// result[0] = vec[0] * mat[0][0] + vec[0] * mat[1][0] + vec[0] * mat[2][0] + vec[0] * mat[3][0];
-		// result[1] = vec[1] * mat[0][1] + vec[1] * mat[1][1] + vec[1] * mat[2][1] + vec[1] * mat[3][1];
-		// result[2] = vec[2] * mat[0][2] + vec[2] * mat[1][2] + vec[2] * mat[2][0] + vec[2] * mat[3][2];
-		// result[3] = vec[3] * mat[0][3] + vec[3] * mat[1][3] + vec[3] * mat[2][3] + vec[3] * mat[3][3];
+		auto v0 = _mm_set1_ps(vec[0]);
+		auto v1 = _mm_set1_ps(vec[1]);
+		auto v2 = _mm_set1_ps(vec[2]);
+		auto v3 = _mm_set1_ps(vec[3]);
+
+		__m128 r = _mm_setzero_ps();
+
+		auto m0 = _mm_loadu_ps(mat[0].data());
+		auto m1 = _mm_loadu_ps(mat[1].data());
+		auto m2 = _mm_loadu_ps(mat[2].data());
+		auto m3 = _mm_loadu_ps(mat[3].data());
+
+		r = _mm_fmadd_ps(v0, m0, r);
+		r = _mm_fmadd_ps(v1, m1, r);
+		r = _mm_fmadd_ps(v2, m2, r);
+		r = _mm_fmadd_ps(v3, m3, r);
+
+		_mm_storeu_ps(result.data(), r);
+
+		// result[0] = vec[0] * mat[0][0] + vec[1] * mat[1][0] + vec[2] * mat[2][0] + vec[3] * mat[3][0];
+		// result[1] = vec[0] * mat[0][1] + vec[1] * mat[1][1] + vec[2] * mat[2][1] + vec[3] * mat[3][1];
+		// result[2] = vec[0] * mat[0][2] + vec[1] * mat[1][2] + vec[2] * mat[2][0] + vec[3] * mat[3][2];
+		// result[3] = vec[0] * mat[0][3] + vec[1] * mat[1][3] + vec[2] * mat[2][3] + vec[3] * mat[3][3];
 
 		return result;
 	}
@@ -141,7 +196,7 @@ namespace ta
 		return result;
 	}
 
-	mat4 scale(const mat4& mat, const vec3& size) noexcept
+	mat4 scale(const mat4 &mat, const vec3 &size) noexcept
 	{
 		mat4 scl(1.f);
 
@@ -152,7 +207,7 @@ namespace ta
 		return scl * mat;
 	}
 
-	mat4 rotate(const mat4& mat, const vec3& axis, float angle) noexcept
+	mat4 rotate(const mat4 &mat, const vec3 &axis, float angle) noexcept
 	{
 		mat4 rtt;
 
@@ -181,8 +236,7 @@ namespace ta
 		return rtt * mat;
 	}
 
-	
-	mat4 translate(const mat4& mat, const vec3& offset) noexcept
+	mat4 translate(const mat4 &mat, const vec3 &offset) noexcept
 	{
 		mat4 trlt(1.f);
 
@@ -192,7 +246,5 @@ namespace ta
 
 		return trlt * mat;
 	}
-
-
 
 }

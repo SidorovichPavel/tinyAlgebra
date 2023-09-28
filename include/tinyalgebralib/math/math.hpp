@@ -23,7 +23,10 @@ namespace ta
 			u.x() * v.y() - u.y() * v.x()};
 	}
 
+
 	mat4 operator*(const mat4 &A, const mat4 &B) noexcept;
+
+	mat4 transpose(const mat4 &mat) noexcept;
 
 	vec4 operator*(const mat4 &mat, const vec4 &vec) noexcept;
 	vec4 operator*(const vec4& vec, const mat4& mat) noexcept;
