@@ -93,7 +93,7 @@ namespace ta
 
 	mat4 look_at(vec3 pos, vec3 target, vec3 up) noexcept
 	{
-		vec3 camera_dir = normalize(pos - target);
+		vec3 camera_dir = normalize(target - pos);
 		vec3 camera_right = normalize(cross(up, camera_dir));
 		vec3 camera_up = cross(camera_dir, camera_right);
 
@@ -140,5 +140,59 @@ namespace ta
 
 		return result;
 	}
+
+	mat4 scale(const mat4& mat, const vec3& size) noexcept
+	{
+		mat4 scl(1.f);
+
+		scl[0][0] = size.x();
+		scl[1][1] = size.y();
+		scl[2][2] = size.z();
+
+		return scl * mat;
+	}
+
+	mat4 rotate(const mat4& mat, const vec3& axis, float angle) noexcept
+	{
+		mat4 rtt;
+
+		float sina = std::sin(angle);
+		float cosa = std::cos(angle);
+
+		float one_sub_cosa = 1 - cosa;
+		float axis_xy = axis.x() * axis.y();
+		float axis_xz = axis.x() * axis.z();
+		float axis_yz = axis.y() * axis.z();
+
+		rtt[0][0] = cosa + axis.x() * axis.x() * one_sub_cosa;
+		rtt[0][1] = axis_xy * one_sub_cosa - axis.z() * sina;
+		rtt[0][2] = axis_xz * one_sub_cosa + axis.y() * sina;
+
+		rtt[1][0] = axis_xy + axis.z() * cosa;
+		rtt[1][1] = cosa + axis.y() * axis.y() * one_sub_cosa;
+		rtt[1][2] = axis_yz * one_sub_cosa - axis.x() * sina;
+
+		rtt[2][0] = axis_xz * one_sub_cosa - axis.y() * sina;
+		rtt[2][1] = axis_yz * one_sub_cosa + axis.x() * sina;
+		rtt[2][2] = cosa + axis.z() * axis.z() * one_sub_cosa;
+
+		rtt[3][3] = 1.f;
+
+		return rtt * mat;
+	}
+
+	
+	mat4 translate(const mat4& mat, const vec3& offset) noexcept
+	{
+		mat4 trlt(1.f);
+
+		trlt[0][3] = offset.x();
+		trlt[1][3] = offset.y();
+		trlt[2][3] = offset.z();
+
+		return trlt * mat;
+	}
+
+
 
 }

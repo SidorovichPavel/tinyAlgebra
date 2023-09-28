@@ -33,4 +33,6 @@ namespace ta
 	mat4 perspective(float fovy, float aspect, float near, float far) noexcept;
 
 	float rad(float deg) noexcept;
+
+	mat4 rotate(const mat4& mat, const vec3& axis, float angle) noexcept;
 }
