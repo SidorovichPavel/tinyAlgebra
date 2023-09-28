@@ -121,7 +121,7 @@ namespace ta
 
 	float rad(float degs) noexcept
 	{
-		constexpr auto degsppi = 180.f / std::numbers::pi;
+		constexpr auto degsppi = std::numbers::pi / 180.f;
 		return degsppi * degs;
 	}
 
