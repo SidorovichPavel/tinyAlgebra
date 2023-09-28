@@ -8,8 +8,8 @@ set(SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
-set_target_properties(tinyalgebralib PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED On)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED On)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-export(TARGETS ${PROJECT_NAME} FILE ${CMAKE_BINARY_DIR}/tinyalgebralib.cmake)
+export(TARGETS ${PROJECT_NAME} FILE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.cmake)
