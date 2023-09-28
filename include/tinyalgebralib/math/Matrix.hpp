@@ -50,8 +50,14 @@ namespace ta
 				mData[i][i] = _Val;
 		}
 
-		Matrix(const this_type&) = default;
-		Matrix(this_type&&) = default;
+		Matrix(const this_type& other) noexcept
+		{
+			std::copy(other.begin(), other.end(), begin());
+		}
+		Matrix(this_type&& other) noexcept 
+		{
+			std::copy(other.begin(), other.end(), begin());
+		}
 
 		Matrix(std::initializer_list<column_type> _Init_list)
 		{
