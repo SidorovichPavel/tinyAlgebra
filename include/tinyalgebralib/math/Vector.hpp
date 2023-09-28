@@ -55,10 +55,11 @@ namespace ta
 		}
 
 	public:
-		Vector(T _Val)
+		template<class U>
+		Vector(U val)
 		{
 			auto [begin, end] = _get_range();
-			std::fill(begin, end, _Val);
+			std::fill(begin, end, static_cast<T>(val));
 		}
 		Vector()
 		{
@@ -66,8 +67,23 @@ namespace ta
 			std::fill(begin, end, static_cast<T>(0));
 		}
 
-		Vector(const this_type &) = default;
-		Vector(this_type &&) = default;
+		template<class U>
+		Vector(const Vector<U, Dim> &other)
+		{
+			std::copy(other.data_, other.data_ + Dim, data_);
+		}
+
+		template<class U>
+		Vector(Vector<U, Dim> &other)
+		{
+			std::copy(other.data_, other.data_ + Dim, data_);
+		}
+
+		template<class U>
+		Vector(Vector<U, Dim> &&other)
+		{
+			std::copy(other.data_, other.data_ + Dim, data_);
+		}
 
 		Vector(std::initializer_list<T> init_list)
 		{
@@ -79,13 +95,14 @@ namespace ta
 			std::copy(other_begin, other_end, data_);
 			data_[Dim - 1] = _Val;
 		}
-		template<class... Args>
-		Vector(Args&&... args)
+
+		template <class... Args>
+		Vector(Args &&...args)
 		{
 			static_assert(sizeof...(Args) <= Dim, "Too many indices for construct");
 			static_assert(detail::is_same_pack<T, std::remove_reference_t<Args>...>::value, "Incorrect arguments type");
 
-			size_t idx=0;
+			size_t idx = 0;
 			(((*this)[idx++] = args), ...);
 		}
 
@@ -98,8 +115,23 @@ namespace ta
 			return Dim;
 		}
 
-		this_type &operator=(const Vector<T, Dim> &) = default;
-		this_type &operator=(Vector<T, Dim> &&) = default;
+		template <class U>
+		this_type &operator=(const Vector<U, Dim>& right) noexcept
+		{
+			auto [right_begin, right_end] = right._get_range();
+			auto [begin, end] = _get_range();
+			std::copy(right_begin, right_end, begin);
+			return *this;
+		}
+
+		template <class U>
+		this_type &operator=(Vector<U, Dim>&& right) noexcept
+		{
+			auto [right_begin, right_end] = right._get_range();
+			auto [begin, end] = _get_range();
+			std::copy(right_begin, right_end, begin);
+			return *this;
+		}
 
 		this_type operator-() const noexcept
 		{
@@ -138,9 +170,9 @@ namespace ta
 		{
 			auto [right_begin, right_end] = right._get_range();
 			auto [begin, end] = _get_range();
-			std::transform(right_begin, right_end, begin, begin,
+			std::transform(begin, end, right_begin, begin,
 						   [](auto a, auto b)
-						   { return static_cast<T>(b - a); });
+						   { return static_cast<T>(a - b); });
 			return *this;
 		}
 
@@ -298,27 +330,27 @@ namespace ta
 	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(const Vector<T, Dim> &vec, U _Val) noexcept
 	{
 		return vec.transform_to_new([_Val](auto e)
-									 { return static_cast<T>(_Val * e); });
+									{ return static_cast<T>(_Val * e); });
 	}
 
 	template <class T, class U, size_t Dim>
 	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(const Vector<T, Dim> &vec, U _Val) noexcept
 	{
 		return vec.transform_to_new([_Val](auto e)
-									 { return static_cast<T>(e / _Val); });
+									{ return static_cast<T>(e / _Val); });
 	}
 
 	template <class T, class U, size_t Dim>
 	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(U _Val, const Vector<T, Dim> &vec) noexcept
 	{
 		return vec.transform_to_new([_Val](auto e)
-									 { return static_cast<T>(_Val * e); });
+									{ return static_cast<T>(_Val * e); });
 	}
 
 	template <class T, class U, size_t Dim>
 	std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(U _Val, const Vector<T, Dim> &vec) noexcept
 	{
 		return vec.transform_to_new([_Val](auto e)
-									 { return static_cast<T>(_Val / e); });
+									{ return static_cast<T>(_Val / e); });
 	}
 };
