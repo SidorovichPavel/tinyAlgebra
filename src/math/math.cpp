@@ -82,17 +82,7 @@ namespace ta
 
 	vec4 operator*(const mat4& mat, const vec4& vec) noexcept
 	{
-		vec4 result;
-
-		__m128 vector = _mm_loadu_ps(vec.data());
-		
-		__m128 r = _mm_mul_ps(vector, _mm_loadu_ps(mat[0].data()));
-		r = _mm_add_ps(r, _mm_mul_ps(_mm_shuffle_ps(vector, vector, _MM_SHUFFLE(1, 1, 1, 1)), _mm_loadu_ps(mat[1].data())));
-		r = _mm_add_ps(r, _mm_mul_ps(_mm_shuffle_ps(vector, vector, _MM_SHUFFLE(2, 2, 2, 2)), _mm_loadu_ps(mat[2].data())));
-		r = _mm_add_ps(r, _mm_mul_ps(_mm_shuffle_ps(vector, vector, _MM_SHUFFLE(3, 3, 3, 3)), _mm_loadu_ps(mat[3].data())));
-
-		_mm_store_ps(result.data(), r);
-		return result;
+		return vec * transpose(mat);
 	}
 
 	vec4 operator*(const vec4& vec, const mat4& mat) noexcept
@@ -156,9 +146,9 @@ namespace ta
 		result[0][0] = 1.f / (aspect * tg_half_fovy);
 		result[1][1] = 1.f / (tg_half_fovy);
 		result[2][2] = (z_near - z_far) * rdist;
-		result[2][3] = -1.f;
-		result[3][2] = -2 * z_far * z_near * rdist;
-
+		result[2][3] = -2 * z_far * z_near * rdist;
+		result[3][2] = -1.f;
+		
 		return result;
 	}
 
