@@ -113,12 +113,6 @@ namespace ta
 	{
 		vec4 result(0.f);
 
-		// for (int j = 0; j < 4; ++j)
-		// {
-		// 	for (int k = 0; k < 4; k++)
-		// 		result[j] += vec[k] * mat[k][j];
-		// }
-
 		auto v0 = _mm_set1_ps(vec[0]);
 		auto v1 = _mm_set1_ps(vec[1]);
 		auto v2 = _mm_set1_ps(vec[2]);
@@ -137,11 +131,6 @@ namespace ta
 		r = _mm_fmadd_ps(v3, m3, r);
 
 		_mm_storeu_ps(result.data(), r);
-
-		// result[0] = vec[0] * mat[0][0] + vec[1] * mat[1][0] + vec[2] * mat[2][0] + vec[3] * mat[3][0];
-		// result[1] = vec[0] * mat[0][1] + vec[1] * mat[1][1] + vec[2] * mat[2][1] + vec[3] * mat[3][1];
-		// result[2] = vec[0] * mat[0][2] + vec[1] * mat[1][2] + vec[2] * mat[2][0] + vec[3] * mat[3][2];
-		// result[3] = vec[0] * mat[0][3] + vec[1] * mat[1][3] + vec[2] * mat[2][3] + vec[3] * mat[3][3];
 
 		return result;
 	}
