@@ -9,12 +9,12 @@
 
 namespace ta
 {
-	float dot(const vec3 &v1, const vec3 &v2)
+	float dot(const vec3& v1, const vec3& v2)
 	{
 		return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() + v2.z();
 	}
 
-	Vector<float, 4> operator+(const Vector<float, 4> &_V, const Vector<float, 4> &_U) noexcept
+	Vector<float, 4> operator+(const Vector<float, 4>& _V, const Vector<float, 4>& _U) noexcept
 	{
 		Vector<float, 4> result;
 		__m128 v = _mm_load_ps(_V.data());
@@ -24,7 +24,7 @@ namespace ta
 		return result;
 	}
 
-	Vector<float, 4> operator-(const Vector<float, 4> &_V, const Vector<float, 4> &_U) noexcept
+	Vector<float, 4> operator-(const Vector<float, 4>& _V, const Vector<float, 4>& _U) noexcept
 	{
 		Vector<float, 4> result;
 		__m128 v = _mm_load_ps(_V.data());
@@ -34,7 +34,7 @@ namespace ta
 		return result;
 	}
 
-	mat4 operator*(const mat4 &A, const mat4 &B) noexcept
+	mat4 operator*(const mat4& A, const mat4& B) noexcept
 	{
 		mat4 result;
 
@@ -45,14 +45,12 @@ namespace ta
 
 		for (int i = 0; i < 4; i++)
 		{
-			__m128 r = _mm_setzero_ps();
-
 			auto ai0 = _mm_set1_ps(A[i][0]);
 			auto ai1 = _mm_set1_ps(A[i][1]);
 			auto ai2 = _mm_set1_ps(A[i][2]);
 			auto ai3 = _mm_set1_ps(A[i][3]);
 
-			r = _mm_fmadd_ps(ai0, b0, r);
+			auto r = _mm_mul_ps(ai0, b0);
 			r = _mm_fmadd_ps(ai1, b1, r);
 			r = _mm_fmadd_ps(ai2, b2, r);
 			r = _mm_fmadd_ps(ai3, b3, r);
@@ -63,33 +61,41 @@ namespace ta
 		return result;
 	}
 
-	mat4 transpose(const mat4 &mat) noexcept
+	mat4 transpose(const mat4& mat) noexcept
 	{
-		mat4 result;
+		mat4 result = mat;
 
-		for (int i = 0; i < 4; i++)
-			for (int j = i; j < 4; j++)
-			{
-				result[i][j] = mat[j][i];
-				result[j][i] = mat[i][j];
-			}
+		__m128 row1 = _mm_loadu_ps(mat[0].data());
+		__m128 row2 = _mm_loadu_ps(mat[1].data());
+		__m128 row3 = _mm_loadu_ps(mat[2].data());
+		__m128 row4 = _mm_loadu_ps(mat[3].data());
+
+		_MM_TRANSPOSE4_PS(row1, row2, row3, row4);
+
+		_mm_storeu_ps(result[0].data(), row1);
+		_mm_storeu_ps(result[1].data(), row2);
+		_mm_storeu_ps(result[2].data(), row3);
+		_mm_storeu_ps(result[3].data(), row4);
 
 		return result;
 	}
 
-	vec4 operator*(const mat4 &mat, const vec4 &vec) noexcept
+	vec4 operator*(const mat4& mat, const vec4& vec) noexcept
 	{
 		vec4 result;
 
-		result[0] = mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2] + mat[0][3] * vec[3];
-		result[1] = mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2] + mat[1][3] * vec[3];
-		result[2] = mat[2][0] * vec[0] + mat[2][1] * vec[1] + mat[2][2] * vec[2] + mat[2][3] * vec[3];
-		result[3] = mat[3][0] * vec[0] + mat[3][1] * vec[1] + mat[3][2] * vec[2] + mat[3][3] * vec[3];
+		__m128 vector = _mm_loadu_ps(vec.data());
+		
+		__m128 r = _mm_mul_ps(vector, _mm_loadu_ps(mat[0].data()));
+		r = _mm_add_ps(r, _mm_mul_ps(_mm_shuffle_ps(vector, vector, _MM_SHUFFLE(1, 1, 1, 1)), _mm_loadu_ps(mat[1].data())));
+		r = _mm_add_ps(r, _mm_mul_ps(_mm_shuffle_ps(vector, vector, _MM_SHUFFLE(2, 2, 2, 2)), _mm_loadu_ps(mat[2].data())));
+		r = _mm_add_ps(r, _mm_mul_ps(_mm_shuffle_ps(vector, vector, _MM_SHUFFLE(3, 3, 3, 3)), _mm_loadu_ps(mat[3].data())));
 
+		_mm_store_ps(result.data(), r);
 		return result;
 	}
 
-	vec4 operator*(const vec4 &vec, const mat4 &mat) noexcept
+	vec4 operator*(const vec4& vec, const mat4& mat) noexcept
 	{
 		vec4 result(0.f);
 
@@ -98,14 +104,12 @@ namespace ta
 		auto v2 = _mm_set1_ps(vec[2]);
 		auto v3 = _mm_set1_ps(vec[3]);
 
-		__m128 r = _mm_setzero_ps();
-
 		auto m0 = _mm_loadu_ps(mat[0].data());
 		auto m1 = _mm_loadu_ps(mat[1].data());
 		auto m2 = _mm_loadu_ps(mat[2].data());
 		auto m3 = _mm_loadu_ps(mat[3].data());
 
-		r = _mm_fmadd_ps(v0, m0, r);
+		auto r = _mm_mul_ps(v0, m0);
 		r = _mm_fmadd_ps(v1, m1, r);
 		r = _mm_fmadd_ps(v2, m2, r);
 		r = _mm_fmadd_ps(v3, m3, r);
@@ -126,7 +130,7 @@ namespace ta
 			ta::vec4(camera_up, 0.f),
 			ta::vec4(-camera_dir, 0.f),
 			ta::vec4(ta::vec3(0.f), 1.f)
-		});
+			});
 
 		mat4 b(1.f);
 		b[0][3] = -pos[0];
@@ -158,7 +162,7 @@ namespace ta
 		return result;
 	}
 
-	mat4 scale(const mat4 &mat, const vec3 &size) noexcept
+	mat4 scale(const mat4& mat, const vec3& size) noexcept
 	{
 		mat4 scl(1.f);
 
@@ -169,7 +173,7 @@ namespace ta
 		return scl * mat;
 	}
 
-	mat4 rotate(const mat4 &mat, const vec3 &axis, float angle) noexcept
+	mat4 rotate(const mat4& mat, const vec3& axis, float angle) noexcept
 	{
 		mat4 rtt;
 
@@ -198,7 +202,7 @@ namespace ta
 		return rtt * mat;
 	}
 
-	mat4 translate(const mat4 &mat, const vec3 &offset) noexcept
+	mat4 translate(const mat4& mat, const vec3& offset) noexcept
 	{
 		mat4 trlt(1.f);
 
