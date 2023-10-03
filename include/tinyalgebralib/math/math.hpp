@@ -1,14 +1,21 @@
 #pragma once
 
-#include "type_decl.hpp"
 #include <limits>
 #include <numeric>
+#include <limits>
+#include <stdexcept>
+
+#include "type_decl.hpp"
+
 
 namespace ta
 {
 	template <class T, size_t Dim>
 	Vector<T, Dim> normalize(const Vector<T, Dim> &vec)
 	{
+		if (std::abs(vec.length()) < std::numeric_limits<float>::epsilon())
+			throw std::runtime_error("try normalize zero vec");
+		
 		auto rlen = 1.f / vec.length();
 		return vec * rlen;
 	}
