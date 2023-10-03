@@ -89,7 +89,9 @@ namespace ta
 		{
 			std::copy(init_list.begin(), init_list.end(), data_);
 		}
-		Vector(Vector<T, (Dim - 1)> &vec, T _Val)
+
+		template<class U>
+		Vector(Vector<U, (Dim - 1)> vec, T _Val)
 		{
 			auto [other_begin, other_end] = vec._get_range();
 			std::copy(other_begin, other_end, data_);
