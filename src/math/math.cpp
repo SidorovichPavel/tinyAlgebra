@@ -148,23 +148,16 @@ namespace ta
 
 	mat4 look_at(vec3 pos, vec3 target, vec3 up) noexcept
 	{
-		vec3 camera_dir = normalize(target - pos);
+		vec3 camera_dir = normalize(pos - target);
 		vec3 camera_right = normalize(cross(up, camera_dir));
 		vec3 camera_up = cross(camera_dir, camera_right);
 
-		mat4 a(1.f);
-
-		a[0][0] = camera_right[0];
-		a[0][1] = camera_right[1];
-		a[0][2] = camera_right[2];
-
-		a[1][0] = camera_up[0];
-		a[1][1] = camera_up[1];
-		a[1][2] = camera_up[2];
-
-		a[2][0] = camera_dir[0];
-		a[2][1] = camera_dir[1];
-		a[2][2] = camera_dir[2];
+		mat4 a({
+			ta::vec4(camera_right, 0.f),
+			ta::vec4(camera_up, 0.f),
+			ta::vec4(-camera_dir, 0.f),
+			ta::vec4(ta::vec3(0.f), 1.f)
+		});
 
 		mat4 b(1.f);
 		b[0][3] = -pos[0];
@@ -190,8 +183,8 @@ namespace ta
 		result[0][0] = 1.f / (aspect * tg_half_fovy);
 		result[1][1] = 1.f / (tg_half_fovy);
 		result[2][2] = (z_near - z_far) * rdist;
-		result[2][3] = -2 * z_far * z_near * rdist;
-		result[3][2] = -1.f;
+		result[2][3] = -1.f;
+		result[3][2] = -2 * z_far * z_near * rdist;
 
 		return result;
 	}
