@@ -125,12 +125,11 @@ namespace ta
 			static_assert(detail::is_same_pack<T, std::remove_reference_t<Args>...>::value, "Incorrect arguments type");
 
 			size_t idx = 0;
-			(((*this)[idx++] = args), ...);
+			((data_[idx++] = args), ...);
 		}
 
-		~Vector()
-		{
-		}
+		constexpr ~Vector()
+		{		}
 
 		static constexpr size_t size() noexcept
 		{
@@ -296,6 +295,54 @@ namespace ta
 
 		template <class U = T>
 		detail::enable_if_t<T, U, (Dim > 3)> w() const
+		{
+			return data_[3];
+		}
+
+		template <class U = T>
+		detail::enable_if_t<T, U&, (Dim > 0)> r()
+		{
+			return data_[0];
+		}
+
+		template <class U = T>
+		detail::enable_if_t<T, U, (Dim > 0)> r() const
+		{
+			return data_[0];
+		}
+
+		template <class U = T>
+		detail::enable_if_t<T, U&, (Dim > 1)> g()
+		{
+			return data_[1];
+		}
+
+		template <class U = T>
+		detail::enable_if_t<T, U, (Dim > 1)> g() const
+		{
+			return data_[1];
+		}
+
+		template <class U = T>
+		detail::enable_if_t<T, U&, (Dim > 2)> b()
+		{
+			return data_[2];
+		}
+
+		template <class U = T>
+		detail::enable_if_t<T, U, (Dim > 2)> b() const
+		{
+			return data_[2];
+		}
+
+		template <class U = T>
+		detail::enable_if_t<T, U&, (Dim > 3)> a()
+		{
+			return data_[3];
+		}
+
+		template <class U = T>
+		detail::enable_if_t<T, U, (Dim > 3)> a() const
 		{
 			return data_[3];
 		}
