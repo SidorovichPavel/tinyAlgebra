@@ -118,7 +118,7 @@ namespace ta
 		mat4 a({
 			ta::vec4(camera_right, 0.f),
 			ta::vec4(camera_up, 0.f),
-			ta::vec4(-camera_dir, 0.f),
+			ta::vec4(camera_dir, 0.f),
 			ta::vec4(ta::vec3(0.f), 1.f)
 			});
 
@@ -132,8 +132,8 @@ namespace ta
 
 	float rad(float degs) noexcept
 	{
-		constexpr auto degsppi = std::numbers::pi / 180.f;
-		return degsppi * degs;
+		constexpr auto piondgr = std::numbers::pi / 180.f;
+		return piondgr * degs;
 	}
 
 	mat4 perspective(float fovy, float aspect, float z_near, float z_far) noexcept
@@ -148,8 +148,18 @@ namespace ta
 		result[2][2] = (z_near - z_far) * rdist;
 		result[2][3] = -2 * z_far * z_near * rdist;
 		result[3][2] = -1.f;
-		
+
 		return result;
+	}
+
+	mat4 viewport(int32_t xmin, int32_t ymin, int32_t width, int32_t height) noexcept
+	{
+		return mat4({
+			{ width / 2.f, 0.f, 0.f, xmin + width / 2.f },
+			{ 0.f, -height / 2.f, 0.f, ymin + height / 2.f },
+			{ 0.f,0.f,1.f,0.f },
+			{ 0.f,0.f,0.f,1.f }
+			});
 	}
 
 	mat4 scale(const mat4& mat, const vec3& size) noexcept
