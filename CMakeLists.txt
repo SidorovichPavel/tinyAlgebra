@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -march=native)
 
 set(SOURCES
     src/math/math.cpp
+    src/Camera.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
