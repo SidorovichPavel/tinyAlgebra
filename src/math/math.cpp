@@ -14,22 +14,22 @@ namespace ta
 		return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() + v2.z();
 	}
 
-	Vector<float, 4> operator+(const Vector<float, 4>& _V, const Vector<float, 4>& _U) noexcept
+	vec4 operator+(const vec4& u, const vec4& v) noexcept
 	{
 		Vector<float, 4> result;
-		__m128 v = _mm_load_ps(_V.data());
-		__m128 u = _mm_load_ps(_U.data());
-		__m128 res = _mm_add_ps(v, u);
+		__m128 uu = _mm_load_ps(u.data());
+		__m128 vv = _mm_load_ps(v.data());
+		__m128 res = _mm_add_ps(vv, uu);
 		_mm_storeu_ps(result.data(), res);
 		return result;
 	}
 
-	Vector<float, 4> operator-(const Vector<float, 4>& _V, const Vector<float, 4>& _U) noexcept
+	vec4 operator-(const vec4& u, const vec4& v) noexcept
 	{
 		Vector<float, 4> result;
-		__m128 v = _mm_load_ps(_V.data());
-		__m128 u = _mm_load_ps(_U.data());
-		__m128 res = _mm_sub_ps(v, u);
+		__m128 uu = _mm_load_ps(u.data());
+		__m128 vv = _mm_load_ps(v.data());
+		__m128 res = _mm_sub_ps(uu, vv);
 		_mm_storeu_ps(result.data(), res);
 		return result;
 	}
