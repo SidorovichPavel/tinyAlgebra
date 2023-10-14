@@ -41,6 +41,7 @@ namespace ta
 	
 	float rad(float deg) noexcept;
 
+	mat4 scale(const mat4& mat, const vec3& size) noexcept;
 	mat4 rotate(const mat4& mat, const vec3& axis, float angle) noexcept;
 	mat4 translate(const mat4& mat, const vec3& offset) noexcept;
 }
