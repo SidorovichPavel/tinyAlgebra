@@ -63,11 +63,10 @@ namespace ta
 			std::fill(begin, end, static_cast<T>(0));
 		}
 
-		template<class U>
-		constexpr Vector(U val)
+		constexpr Vector(T val)
 		{
 			auto [begin, end] = _get_range();
-			std::fill(begin, end, static_cast<T>(val));
+			std::fill(begin, end, val);
 		}
 
 		template<class U>
@@ -118,14 +117,22 @@ namespace ta
 			data_[Dim - 1] = static_cast<T>(val);
 		}
 
+		template<class U>
+		constexpr Vector(Vector<U, (Dim + 1)>&& vec)
+		{
+			auto [other_begin, _] = vec._get_range();
+			std::copy_n(other_begin, Dim, data_);
+		}
+
+
 		template <class... Args>
 		constexpr Vector(Args&&...args)
 		{
 			static_assert(sizeof...(Args) <= Dim, "Too many indices for construct");
 			static_assert(detail::is_same_pack<T, std::remove_reference_t<Args>...>::value, "Incorrect arguments type");
 
-			size_t idx = 0;
-			((data_[idx++] = args), ...);
+			auto it = begin();
+			((*it++ = args), ...);
 		}
 
 		constexpr ~Vector()
@@ -197,10 +204,10 @@ namespace ta
 			return *this;
 		}
 
-		iterator begin() noexcept { return data_; }
-		iterator end() noexcept { return data_ + Dim; }
-		const_iterator begin() const noexcept { return data_; }
-		const_iterator end() const noexcept { return data_ + Dim; }
+		constexpr iterator begin() noexcept { return data_; }
+		constexpr iterator end() noexcept { return data_ + Dim; }
+		constexpr const_iterator begin() const noexcept { return data_; }
+		constexpr const_iterator end() const noexcept { return data_ + Dim; }
 
 		value_type* data() noexcept
 		{
