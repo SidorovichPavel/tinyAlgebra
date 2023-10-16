@@ -119,7 +119,7 @@ namespace ta
 			ta::vec4(camera_right, 0.f),
 			ta::vec4(camera_up, 0.f),
 			ta::vec4(camera_dir, 0.f),
-			ta::vec4(ta::vec3(0.f), 1.f)
+			ta::vec4(0.f, 0.f, 0.f, 1.f)
 			});
 
 		mat4 b(1.f);
