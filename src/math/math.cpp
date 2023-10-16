@@ -154,9 +154,11 @@ namespace ta
 
 	mat4 viewport(int32_t xmin, int32_t ymin, int32_t width, int32_t height) noexcept
 	{
+		auto half_width = width / 2.f;
+		auto half_height = height / 2.f;
 		return mat4({
-			{ width / 2.f, 0.f, 0.f, xmin + width / 2.f },
-			{ 0.f, -height / 2.f, 0.f, ymin + height / 2.f },
+			{ half_width, 0.f, 0.f, xmin + half_width },
+			{ 0.f, -half_height, 0.f, ymin + half_height },
 			{ 0.f,0.f,1.f,0.f },
 			{ 0.f,0.f,0.f,1.f }
 			});
