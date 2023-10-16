@@ -118,12 +118,25 @@ namespace ta
 		}
 
 		template<class U>
-		constexpr Vector(Vector<U, (Dim + 1)>&& vec)
+		constexpr Vector(Vector<U, (Dim + 1)>& vec)
 		{
 			auto [other_begin, _] = vec._get_range();
 			std::copy_n(other_begin, Dim, data_);
 		}
 
+		template<class U>
+		constexpr Vector(const Vector<U, (Dim + 1)>& vec)
+		{
+			auto [other_begin, _] = vec._get_range();
+			std::copy_n(other_begin, Dim, data_);
+		}
+
+		template<class U>
+		constexpr Vector(Vector<U, (Dim + 1)>&& vec)
+		{
+			auto [other_begin, _] = vec._get_range();
+			std::copy_n(other_begin, Dim, data_);
+		}
 
 		template <class... Args>
 		constexpr Vector(Args&&...args)
@@ -201,6 +214,47 @@ namespace ta
 			std::transform(begin, end, right_begin, begin,
 				[](auto a, auto b)
 				{ return static_cast<T>(a - b); });
+			return *this;
+		}
+
+		template <class U>
+		this_type& operator+=(const U& right) noexcept
+		{
+			auto [begin, end] = _get_range();
+			std::transform(begin, end, begin,
+				[&](auto a)
+				{ return static_cast<T>(a + right); });
+			return *this;
+		}
+
+		template <class U>
+		this_type& operator-=(const U& right) noexcept
+		{
+			auto [begin, end] = _get_range();
+			std::transform(begin, end, begin,
+				[&](auto a)
+				{ return static_cast<T>(a - right); });
+			return *this;
+		}
+
+		template <class U>
+		this_type& operator*=(const U& right) noexcept
+		{
+			auto [begin, end] = _get_range();
+			std::transform(begin, end, begin,
+				[&](auto a)
+				{ return static_cast<T>(a * right); });
+			return *this;
+		}
+
+		template <class U>
+		this_type& operator/=(const U& right) noexcept
+		{
+			auto rright = 1.f / right;
+			auto [begin, end] = _get_range();
+			std::transform(begin, end, begin,
+				[&](auto a)
+				{ return static_cast<T>(a * rright); });
 			return *this;
 		}
 
