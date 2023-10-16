@@ -138,13 +138,13 @@ namespace ta
 
 	mat4 perspective(float fovy, float aspect, float z_near, float z_far) noexcept
 	{
-		auto tg_half_fovy = std::tan(fovy / 2.f);
+		auto ctg_half_fovy = 1.f / std::tan(fovy / 2.f);
 		auto rdist = 1.f / (z_far - z_near);
 
 		mat4 result(0.f);
 
-		result[0][0] = 1.f / (aspect * tg_half_fovy);
-		result[1][1] = 1.f / (tg_half_fovy);
+		result[0][0] = ctg_half_fovy / aspect;
+		result[1][1] = ctg_half_fovy;
 		result[2][2] = (z_near - z_far) * rdist;
 		result[2][3] = -2 * z_far * z_near * rdist;
 		result[3][2] = -1.f;
