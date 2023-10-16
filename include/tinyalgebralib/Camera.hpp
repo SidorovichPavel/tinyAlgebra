@@ -9,21 +9,21 @@ namespace ta
 
 	class Camera
 	{
-		vec3 mPosition;
-		vec3 mDirection;
-		vec3 mUp;
-		vec3 mRight;
-		vec3 mStartDirection;
-		vec3 mStartUp;
-		vec3 mStartRight;
+		vec3 position_;
+		vec3 direction_;
+		vec3 up_;
+		vec3 right_;
+		vec3 start_direction_;
+		vec3 start_up_;
+		vec3 start_right_;
 
-		mat4 mRotate;
+		mat4 rotate_;
 
-		float mPitch;
-		float mYaw;
-		float mRoll;
+		float pitch_;
+		float yaw_;
+		float roll_;
 
-		bool useQuaternions;
+		bool use_quaternions_;
 
 		void update_vertors() noexcept;
 	public:
@@ -32,14 +32,12 @@ namespace ta
 		Camera(Camera&&) = default;
 		~Camera();
 
-		Camera& operator+=(const vec3& vec)noexcept;
-		Camera& operator-=(const vec3& vec)noexcept;
-
 		mat4 get_view()const noexcept;
-		vec3 get_direction() const noexcept;
-		vec3 get_right() const noexcept;
-		vec3 get_up() const noexcept;
-		vec3 get_position() const noexcept;
+		
+		void move_front(float dist);
+		void move_back(float dist);
+		void move_right(float dist);
+		void move_left(float dist);
 
 		void update_angles(float pitch, float yaw, float roll);
 		void use_quaternoins(bool mode = true);

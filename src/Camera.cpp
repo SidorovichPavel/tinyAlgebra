@@ -1,4 +1,4 @@
-
+#include <cmath>
 
 #include <tinyalgebralib/Camera.hpp>
 
@@ -7,80 +7,74 @@ namespace ta
 
 	Camera::Camera(const vec3 pos, const vec3 target, vec3 up)
 		:
-		mPosition(pos),
-		mDirection(normalize(target - pos)),
-		mUp(normalize(up)),
-		mRotate(mat4(1.f)),
-		mPitch(0.f),
-		mYaw(0.f),
-		mRoll(0.f),
-		useQuaternions(false)
+		position_(pos),
+		direction_(normalize(target - pos)),
+		up_(normalize(up)),
+		rotate_(mat4(1.f)),
+		pitch_(0.f),
+		yaw_(0.f),
+		roll_(0.f),
+		use_quaternions_(false)
 	{
-		mRight = cross(mDirection, mUp);
+		right_ = cross(up_, direction_);
 
-		mStartDirection = mDirection;
-		mStartUp = mUp;
-		mStartRight = mRight;
+		start_direction_ = direction_;
+		start_up_ = up_;
+		start_right_ = right_;
 	}
 
 	Camera::~Camera()
 	{}
 
-	Camera& Camera::operator+=(const vec3& vec)noexcept
+	mat4 Camera::get_view()const noexcept
 	{
-		mPosition += vec;
-		return *this;
+		return ta::look_at(position_, position_ + direction_, up_);
 	}
 
-	Camera& Camera::operator-=(const vec3& vec)noexcept
+	void Camera::move_front(float dist)
 	{
-		mPosition -= vec;
-		return *this;
+		position_ += direction_ * dist;
 	}
 
-	vec3 Camera::get_direction() const noexcept
+	void Camera::move_back(float dist)
 	{
-		return mDirection;
+		position_ -= direction_ * dist;
 	}
 
-	vec3 Camera::get_right() const noexcept
+	void Camera::move_right(float dist)
 	{
-		return mRight;
+		position_ += right_ * dist;
 	}
 
-	vec3 Camera::get_up() const noexcept
+	void Camera::move_left(float dist)
 	{
-		return mUp;
-	}
-
-	vec3 Camera::get_position() const noexcept
-	{
-		return mPosition;
+		position_ -= right_ * dist;
 	}
 
 	void Camera::update_vertors() noexcept
 	{
-		mDirection = vec3(mRotate * vec4(mStartDirection, 1.f));
-		mRight = vec3(mRotate * vec4(mStartRight, 1.f));
-		mUp = vec3(mRotate * vec4(mStartUp, 1.f));
+		direction_ = vec3(vec4(start_direction_, 1.f) * rotate_);
+		right_ = vec3(vec4(start_right_, 1.f) * rotate_);
+		//up_ = vec3(vec4(start_up_, 1.f) * rotate_);
 	}
 
 	//angle pls in radians
 	void Camera::update_angles(float pitch, float yaw, float roll)
 	{
-		mPitch += pitch; mYaw += yaw; mRoll += roll;
-		mRotate = mat4(1.f);
+		pitch_ += pitch; yaw_ += yaw; roll_ += roll;
 
-		mRotate = rotate(mRotate, mStartDirection, mRoll);
-		mRotate = rotate(mRotate, mStartUp, mYaw);
-		mRotate = rotate(mRotate, mStartRight, mPitch);
+		rotate_ = mat4(1.f);
+
+		rotate_ = rotate(rotate_, start_direction_, ta::rad(roll_));
+		rotate_ = rotate(rotate_, start_up_, ta::rad(yaw_));
+		rotate_ = rotate(rotate_, start_right_, ta::rad(pitch_));
 
 		update_vertors();
 	}
 
 	void Camera::use_quaternoins(bool _mode)
 	{
-		useQuaternions = _mode;
+		use_quaternions_ = _mode;
 	}
 
 }
