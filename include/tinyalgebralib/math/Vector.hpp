@@ -46,7 +46,7 @@ namespace ta
 		}
 
 		template <class Fn>
-		Vector<T, Dim> transform_to_new(Fn&& _Func) const noexcept
+		constexpr Vector<T, Dim> transform_to_new(Fn&& _Func) const noexcept
 		{
 			Vector<T, Dim> result;
 			auto [begin, end] = _get_range();
