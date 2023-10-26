@@ -408,7 +408,7 @@ namespace ta
 		template <size_t... Indices>
 		constexpr auto swizzle() const noexcept
 		{
-			static_assert(sizeof...(Indices) <= Dim, "Too many indices for swizzle");
+			//static_assert(sizeof...(Indices) <= Dim, "Too many indices for swizzle");
 			static_assert(((Indices < Dim) && ...), "Invalid swizzle index");
 
 			Vector<T, sizeof...(Indices)> result;
