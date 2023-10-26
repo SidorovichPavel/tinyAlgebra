@@ -31,14 +31,14 @@ namespace ta
 
 	mat4 transpose(const mat4 &mat) noexcept;
 
-	constexpr vec4 operator*(const mat4 &mat, const vec4 &vec) noexcept;
-	constexpr vec4 operator*(const vec4& vec, const mat4& mat) noexcept;
+	vec4 operator*(const mat4 &mat, const vec4 &vec) noexcept;
+	vec4 operator*(const vec4& vec, const mat4& mat) noexcept;
 
 	mat4 look_at(vec3 pos, vec3 target, vec3 up) noexcept;
 	mat4 perspective(float fovy, float aspect, float near, float far) noexcept;
 	mat4 viewport(int32_t xmin, int32_t ymin, int32_t width, int32_t height) noexcept;
 	
-	constexpr float rad(float deg) noexcept;
+	float rad(float deg) noexcept;
 
 	mat4 scale(const mat4& mat, const vec3& size) noexcept;
 	mat4 rotate(const mat4& mat, const vec3& axis, float angle) noexcept;

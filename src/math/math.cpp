@@ -81,7 +81,7 @@ namespace ta
 		return result;
 	}
 
-	constexpr vec4 operator*(const mat4& mat, const vec4& vec) noexcept
+	vec4 operator*(const mat4& mat, const vec4& vec) noexcept
 	{
 		vec4 result;
 
@@ -95,7 +95,7 @@ namespace ta
 		return result;
 	}
 
-	constexpr vec4 operator*(const vec4& vec, const mat4& mat) noexcept
+	vec4 operator*(const vec4& vec, const mat4& mat) noexcept
 	{
 		vec4 result(0.f);
 
@@ -140,7 +140,7 @@ namespace ta
 		return a * b;
 	}
 
-	constexpr float rad(float degs) noexcept
+	float rad(float degs) noexcept
 	{
 		constexpr auto piondgr = std::numbers::pi / 180.f;
 		return piondgr * degs;
