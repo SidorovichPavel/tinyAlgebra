@@ -4,6 +4,7 @@
 #include <numeric>
 #include <limits>
 #include <stdexcept>
+#include <optional>
 
 #include "type_decl.hpp"
 
@@ -43,4 +44,6 @@ namespace ta
 	mat4 scale(const mat4& mat, const vec3& size) noexcept;
 	mat4 rotate(const mat4& mat, const vec3& axis, float angle) noexcept;
 	mat4 translate(const mat4& mat, const vec3& offset) noexcept;
+
+	std::optional<vec3> barycentric(vec2i vtx1, vec2i vtx2, vec2i vtx3, vec2i p) noexcept;
 }

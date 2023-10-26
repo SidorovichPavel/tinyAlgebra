@@ -2,7 +2,6 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
-#include <optional>
 #include <cmath>
 #include <numbers>
 
@@ -84,8 +83,6 @@ namespace ta
 	vec4 operator*(const mat4& mat, const vec4& vec) noexcept
 	{
 		vec4 result;
-
-		auto v = _mm_loadu_ps(vec.data());
 
 		result[0] = mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2] + mat[0][3] * vec[3];
 		result[1] = mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2] + mat[1][3] * vec[3];
@@ -225,7 +222,7 @@ namespace ta
 		return trlt * mat;
 	}
 
-	std::optional<vec3> barycentric(vec2i vtx1, vec2i vtx2, vec2i vtx3, vec2i p) {
+	std::optional<vec3> barycentric(vec2i vtx1, vec2i vtx2, vec2i vtx3, vec2i p) noexcept {
 		// Вычисляем векторное произведение для определения барицентрических координат.
 		vec3 u = cross(vec3(vtx3[0] - vtx1[0], vtx2[0] - vtx1[0], vtx1[0] - p[0]),
 			vec3(vtx3[1] - vtx1[1], vtx2[1] - vtx1[1], vtx1[1] - p[1]));
