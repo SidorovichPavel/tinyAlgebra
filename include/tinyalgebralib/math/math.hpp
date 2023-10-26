@@ -27,6 +27,7 @@ namespace ta
 			u.x() * v.y() - u.y() * v.x()};
 	}
 
+	vec3 cross(const vec3& u, const vec3& v);
 
 	mat4 operator*(const mat4 &A, const mat4 &B) noexcept;
 

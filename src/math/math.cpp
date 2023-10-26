@@ -14,6 +14,23 @@ namespace ta
 		return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() + v2.z();
 	}
 
+	vec3 cross(const vec3& u, const vec3& v)
+	{
+		vec4 u4(u, 0.f), v4(v, 0.f), r4;
+
+		auto a = _mm_load_ps(u4.data());
+		auto b = _mm_load_ps(v4.data());
+
+		auto result = _mm_sub_ps(
+			_mm_mul_ps(_mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 1, 0, 2))),
+			_mm_mul_ps(_mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1)))
+		);
+
+		_mm_storeu_ps(r4.data(), result);
+
+		return vec3(r4);
+	}
+
 	vec4 operator+(const vec4& u, const vec4& v) noexcept
 	{
 		Vector<float, 4> result;
