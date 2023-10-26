@@ -140,10 +140,10 @@ namespace ta
 		constexpr Vector(Args&&...args)
 		{
 			static_assert(sizeof...(Args) <= Dim, "Too many indices for construct");
-			static_assert(detail::is_same_pack<T, std::remove_reference_t<Args>...>::value, "Incorrect arguments type");
+			static_assert(((std::is_arithmetic_v<Args>) && ...), "Incorrect arguments type");
 
 			auto it = begin();
-			((*it++ = args), ...);
+			((*it++ = static_cast<T>(args)), ...);
 		}
 
 		constexpr ~Vector()
