@@ -2,6 +2,7 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
+#include <optional>
 #include <cmath>
 #include <numbers>
 
@@ -16,7 +17,7 @@ namespace ta
 
 	vec4 operator+(const vec4& u, const vec4& v) noexcept
 	{
-		Vector<float, 4> result;
+		vec4 result;
 		__m128 uu = _mm_load_ps(u.data());
 		__m128 vv = _mm_load_ps(v.data());
 		__m128 res = _mm_add_ps(vv, uu);
@@ -26,7 +27,7 @@ namespace ta
 
 	vec4 operator-(const vec4& u, const vec4& v) noexcept
 	{
-		Vector<float, 4> result;
+		vec4 result;
 		__m128 uu = _mm_load_ps(u.data());
 		__m128 vv = _mm_load_ps(v.data());
 		__m128 res = _mm_sub_ps(uu, vv);
@@ -63,7 +64,7 @@ namespace ta
 
 	mat4 transpose(const mat4& mat) noexcept
 	{
-		mat4 result = mat;
+		mat4 result;
 
 		__m128 row1 = _mm_loadu_ps(mat[0].data());
 		__m128 row2 = _mm_loadu_ps(mat[1].data());
@@ -82,7 +83,16 @@ namespace ta
 
 	vec4 operator*(const mat4& mat, const vec4& vec) noexcept
 	{
-		return vec * transpose(mat);
+		vec4 result;
+
+		auto v = _mm_loadu_ps(vec.data());
+
+		result[0] = mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2] + mat[0][3] * vec[3];
+		result[1] = mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2] + mat[1][3] * vec[3];
+		result[2] = mat[2][0] * vec[0] + mat[2][1] * vec[1] + mat[2][2] * vec[2] + mat[2][3] * vec[3];
+		result[3] = mat[3][0] * vec[0] + mat[3][1] * vec[1] + mat[3][2] * vec[2] + mat[3][3] * vec[3];
+
+		return result;
 	}
 
 	vec4 operator*(const vec4& vec, const mat4& mat) noexcept
@@ -215,4 +225,16 @@ namespace ta
 		return trlt * mat;
 	}
 
+	std::optional<vec3> barycentric(vec2i vtx1, vec2i vtx2, vec2i vtx3, vec2i p) {
+		// Вычисляем векторное произведение для определения барицентрических координат.
+		vec3 u = cross(vec3(vtx3[0] - vtx1[0], vtx2[0] - vtx1[0], vtx1[0] - p[0]),
+			vec3(vtx3[1] - vtx1[1], vtx2[1] - vtx1[1], vtx1[1] - p[1]));
+
+		// Проверяем, является ли треугольник вырожденным (площадь равна нулю).
+		if (std::abs(u.z()) < 1)
+			return std::nullopt;
+
+		// Вычисляем барицентрические координаты и возвращаем результат.
+		return std::make_optional<ta::vec3>(1.f - (u.x() + u.y()) / u.z(), u.y() / u.z(), u.x() / u.z());
+	}
 }
