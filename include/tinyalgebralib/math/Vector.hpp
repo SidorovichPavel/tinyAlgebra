@@ -46,9 +46,9 @@ namespace ta
 		}
 
 		template <class Fn>
-		constexpr Vector<T, Dim> transform_to_new(Fn&& _Func) const noexcept
+		constexpr Vector transform_to_new(Fn&& _Func) const noexcept
 		{
-			Vector<T, Dim> result;
+			Vector result;
 			auto [begin, end] = _get_range();
 			auto [rbegin, _] = result._get_range();
 			std::transform(begin, end, rbegin, _Func);
@@ -419,13 +419,13 @@ namespace ta
 	};
 
 	template <class T, class U, size_t Dim>
-	constexpr auto operator+(const Vector<T, Dim>& _V, const Vector<U, Dim>& _U) noexcept -> Vector<decltype(detail::declval_by_mul<T, U>()), Dim>
+	constexpr auto operator+(const Vector<T, Dim>& v, const Vector<U, Dim>& u) noexcept -> Vector<decltype(detail::declval_by_mul<T, U>()), Dim>
 	{
 		using return_type = decltype(detail::declval_by_mul<T, U>());
 
 		Vector<return_type, Dim> result;
-		auto [vbegin, vend] = _V._get_range();
-		auto [ubegin, uend] = _U._get_range();
+		auto [vbegin, vend] = v._get_range();
+		auto [ubegin, uend] = u._get_range();
 		auto [rbegin, rend] = result._get_range();
 
 		std::transform(vbegin, vend, ubegin, rbegin,
@@ -435,13 +435,13 @@ namespace ta
 	}
 
 	template <class T, class U, size_t Dim>
-	constexpr auto operator-(const Vector<T, Dim>& _V, const Vector<U, Dim>& _U) noexcept -> Vector<decltype(detail::declval_by_mul<T, U>()), Dim>
+	constexpr auto operator-(const Vector<T, Dim>& v, const Vector<U, Dim>& u) noexcept -> Vector<decltype(detail::declval_by_mul<T, U>()), Dim>
 	{
 		using return_type = decltype(detail::declval_by_mul<T, U>());
 
 		Vector<return_type, Dim> result;
-		auto [vbegin, vend] = _V._get_range();
-		auto [ubegin, uend] = _U._get_range();
+		auto [vbegin, vend] = v._get_range();
+		auto [ubegin, uend] = u._get_range();
 		auto [rbegin, rend] = result._get_range();
 
 		std::transform(vbegin, vend, ubegin, rbegin,
@@ -450,8 +450,8 @@ namespace ta
 		return result;
 	}
 
-	constexpr Vector<float, 4> operator+(const Vector<float, 4>& _V, const Vector<float, 4>& _U) noexcept;
-	constexpr Vector<float, 4> operator-(const Vector<float, 4>& _V, const Vector<float, 4>& _U) noexcept;
+	constexpr Vector<float, 4> operator+(const Vector<float, 4>& v, const Vector<float, 4>& u) noexcept;
+	constexpr Vector<float, 4> operator-(const Vector<float, 4>& v, const Vector<float, 4>& u) noexcept;
 
 	template <class T, class U, size_t Dim>
 	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(const Vector<T, Dim>& vec, U _Val) noexcept
