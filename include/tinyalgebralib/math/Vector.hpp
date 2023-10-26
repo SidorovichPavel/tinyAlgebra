@@ -142,7 +142,7 @@ namespace ta
 			static_assert(sizeof...(Args) <= Dim, "Too many indices for construct");
 			static_assert(((std::is_arithmetic_v<
 				std::remove_cvref_t<Args>
-				>) && ...), "Incorrect arguments type");
+			>) && ...), "Incorrect arguments type");
 
 			auto it = begin();
 			((*it++ = static_cast<T>(args)), ...);
@@ -303,10 +303,7 @@ namespace ta
 				else
 					not_first_value = true;
 
-				if constexpr (std::is_arithmetic_v<T>)
-					result += std::to_string(e);
-				else
-					result += std::to_string(static_cast<int>(e));
+				result += std::to_string(e);
 			}
 			result += "}";
 			return result;
