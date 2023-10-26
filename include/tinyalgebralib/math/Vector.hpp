@@ -72,19 +72,19 @@ namespace ta
 		template<class U>
 		constexpr Vector(Vector<U, Dim>& other)
 		{
-			std::copy(other.data_, other.data_ + Dim, data_);
+			std::copy(other.begin(), other.end(), data_);
 		}
 
 		template<class U>
 		constexpr Vector(const Vector<U, Dim>& other)
 		{
-			std::copy(other.data_, other.data_ + Dim, data_);
+			std::copy(other.begin(), other.end(), data_);
 		}
 
 		template<class U>
 		constexpr Vector(Vector<U, Dim>&& other)
 		{
-			std::copy(other.data_, other.data_ + Dim, data_);
+			std::copy(other.begin(), other.end(), data_);
 		}
 
 		constexpr Vector(std::initializer_list<T> init_list)
@@ -104,16 +104,14 @@ namespace ta
 		template<class U, class V>
 		constexpr Vector(const Vector<U, (Dim - 1)>& vec, V val)
 		{
-			auto [other_begin, other_end] = vec._get_range();
-			std::copy(other_begin, other_end, data_);
+			std::copy(vec.begin(), vec.end(), data_);
 			data_[Dim - 1] = static_cast<T>(val);
 		}
 
 		template<class U, class V>
 		constexpr Vector(Vector<U, (Dim - 1)>&& vec, V val)
 		{
-			auto [other_begin, other_end] = vec._get_range();
-			std::copy(other_begin, other_end, data_);
+			std::copy(vec.begin(), vec.end(), data_);
 			data_[Dim - 1] = static_cast<T>(val);
 		}
 
