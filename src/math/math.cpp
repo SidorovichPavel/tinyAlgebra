@@ -10,7 +10,7 @@
 
 namespace ta
 {
-	float dot(const vec3& v1, const vec3& v2)
+	constexpr float dot(const vec3& v1, const vec3& v2)
 	{
 		return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() + v2.z();
 	}
@@ -81,7 +81,7 @@ namespace ta
 		return result;
 	}
 
-	vec4 operator*(const mat4& mat, const vec4& vec) noexcept
+	constexpr vec4 operator*(const mat4& mat, const vec4& vec) noexcept
 	{
 		vec4 result;
 
@@ -95,7 +95,7 @@ namespace ta
 		return result;
 	}
 
-	vec4 operator*(const vec4& vec, const mat4& mat) noexcept
+	constexpr vec4 operator*(const vec4& vec, const mat4& mat) noexcept
 	{
 		vec4 result(0.f);
 
@@ -140,7 +140,7 @@ namespace ta
 		return a * b;
 	}
 
-	float rad(float degs) noexcept
+	constexpr float rad(float degs) noexcept
 	{
 		constexpr auto piondgr = std::numbers::pi / 180.f;
 		return piondgr * degs;
