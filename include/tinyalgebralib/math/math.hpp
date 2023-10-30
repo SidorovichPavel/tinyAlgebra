@@ -12,10 +12,9 @@
 namespace ta
 {
 	template <class T, size_t Dim>
-	constexpr Vector<T, Dim> normalize(const Vector<T, Dim> &vec)
+	constexpr Vector<T, Dim> normalize(const Vector<T, Dim> &vec) noexcept
 	{
-		auto rlen = 1.f / vec.length();
-		return vec * rlen;
+		return vec / vec.length();
 	}
 
 	template <class U, class V>
