@@ -31,6 +31,13 @@ namespace ta
 		return ta::look_at(position_, position_ + direction_, up_);
 	}
 
+	void Camera::apply_move(const ta::vec3& move, float distance)
+	{
+		vec3 accum = right_ * move.x() + up_ * move.y() + direction_ * move.z();
+		if (accum.length() > std::numeric_limits<float>::epsilon())
+			position_ += normalize(accum) * distance;
+	}
+
 	void Camera::move_front(float dist)
 	{
 		position_ += direction_ * dist;

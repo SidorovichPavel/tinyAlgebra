@@ -34,6 +34,8 @@ namespace ta
 
 		mat4 get_view()const noexcept;
 		
+		void apply_move(const ta::vec3& move, float distance);
+
 		void move_front(float dist);
 		void move_back(float dist);
 		void move_right(float dist);
