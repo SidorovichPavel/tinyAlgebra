@@ -463,8 +463,9 @@ namespace ta
 	template <class T, class U, size_t Dim>
 	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(const Vector<T, Dim>& vec, U _Val) noexcept
 	{
-		return vec.transform_to_new([_Val](auto e)
-			{ return static_cast<T>(e / _Val); });
+		auto rval = static_cast<U>(1) / _Val;
+		return vec.transform_to_new([rval](auto e)
+			{ return static_cast<T>(e * rval); });
 	}
 
 	template <class T, class U, size_t Dim>
