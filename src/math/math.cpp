@@ -9,11 +9,6 @@
 
 namespace ta
 {
-	constexpr float dot(const vec3& v1, const vec3& v2)
-	{
-		return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() + v2.z();
-	}
-
 	constexpr vec4 operator+(const vec4& u, const vec4& v) noexcept
 	{
 		vec4 result;
@@ -228,10 +223,14 @@ namespace ta
 			vec3(vtx3[1] - vtx1[1], vtx2[1] - vtx1[1], vtx1[1] - p[1]));
 
 		// Проверяем, является ли треугольник вырожденным (площадь равна нулю).
-		if (std::abs(u.z()) < 1)
-			return std::nullopt;
+		if (std::abs(u.z()) > std::numeric_limits<float>::epsilon())
+		{
+			// Вычисляем барицентрические координаты и возвращаем результат.
+			auto rz = 1.f / u.z();
 
-		// Вычисляем барицентрические координаты и возвращаем результат.
-		return std::make_optional<ta::vec3>(1.f - (u.x() + u.y()) / u.z(), u.y() / u.z(), u.x() / u.z());
+			return std::make_optional<ta::vec3>(1.f - (u.x() + u.y()) * rz, u.y() * rz, u.x() * rz);
+		}
+
+		return std::nullopt;
 	}
 }
