@@ -31,31 +31,16 @@ namespace ta
 		return ta::look_at(position_, position_ + direction_, up_);
 	}
 
+	vec3 Camera::position() const noexcept
+	{
+		return position_;
+	}
+
 	void Camera::apply_move(const ta::vec3& move, float distance)
 	{
 		vec3 accum = right_ * move.x() + up_ * move.y() + direction_ * move.z();
 		if (accum.length() > std::numeric_limits<float>::epsilon())
 			position_ += normalize(accum) * distance;
-	}
-
-	void Camera::move_front(float dist)
-	{
-		position_ += direction_ * dist;
-	}
-
-	void Camera::move_back(float dist)
-	{
-		position_ -= direction_ * dist;
-	}
-
-	void Camera::move_right(float dist)
-	{
-		position_ += right_ * dist;
-	}
-
-	void Camera::move_left(float dist)
-	{
-		position_ -= right_ * dist;
 	}
 
 	void Camera::update_vertors() noexcept

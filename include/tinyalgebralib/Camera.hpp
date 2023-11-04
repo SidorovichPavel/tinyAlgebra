@@ -32,14 +32,10 @@ namespace ta
 		Camera(Camera&&) = default;
 		~Camera();
 
-		mat4 get_view()const noexcept;
-		
-		void apply_move(const ta::vec3& move, float distance);
+		mat4 get_view() const noexcept;
+		vec3 position() const noexcept;
 
-		void move_front(float dist);
-		void move_back(float dist);
-		void move_right(float dist);
-		void move_left(float dist);
+		void apply_move(const ta::vec3& move, float distance);
 
 		void update_angles(float pitch, float yaw, float roll);
 		void use_quaternoins(bool mode = true);
