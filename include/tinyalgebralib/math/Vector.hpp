@@ -6,6 +6,9 @@
 #include <functional>
 #include <cmath>
 
+#include <immintrin.h>
+#include <assert.h>
+
 #include "Utility.hpp"
 
 namespace ta
@@ -32,7 +35,7 @@ namespace ta
 		using value_ref_type = value_type&;
 
 	private:
-		value_type data_[Dim];
+		alignas(16) value_type data_[Dim];
 
 	public:
 		constexpr std::pair<iterator, iterator> _get_range() noexcept
@@ -187,11 +190,13 @@ namespace ta
 
 		value_ref_type operator[](size_t idx)
 		{
+			assert(idx < Dim);
 			return data_[idx];
 		}
 
 		value_type operator[](size_t idx) const
 		{
+			assert(idx < Dim);
 			return data_[idx];
 		}
 
@@ -450,8 +455,25 @@ namespace ta
 		return result;
 	}
 
-	constexpr Vector<float, 4> operator+(const Vector<float, 4>& v, const Vector<float, 4>& u) noexcept;
-	constexpr Vector<float, 4> operator-(const Vector<float, 4>& v, const Vector<float, 4>& u) noexcept;
+	constexpr Vector<float, 4> operator+(const Vector<float, 4>& u, const Vector<float, 4>& v) noexcept
+	{
+		Vector<float, 4> result;
+		__m128 uu = _mm_load_ps(u.data());
+		__m128 vv = _mm_load_ps(v.data());
+		__m128 res = _mm_add_ps(vv, uu);
+		_mm_storeu_ps(result.data(), res);
+		return result;
+	}
+
+	constexpr Vector<float, 4> operator-(const Vector<float, 4>& u, const Vector<float, 4>& v) noexcept
+	{
+		Vector<float, 4> result;
+		__m128 uu = _mm_load_ps(u.data());
+		__m128 vv = _mm_load_ps(v.data());
+		__m128 res = _mm_sub_ps(uu, vv);
+		_mm_storeu_ps(result.data(), res);
+		return result;
+	}
 
 	template <class T, class U, size_t Dim>
 	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(const Vector<T, Dim>& vec, U _Val) noexcept
