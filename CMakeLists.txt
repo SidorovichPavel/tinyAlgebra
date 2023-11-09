@@ -12,7 +12,7 @@ set(SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
-target_compile_options(${PROJECT_NAME} PRIVATE -march=native)
+target_compile_options(${PROJECT_NAME} PRIVATE -march=native -ffast-math)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
