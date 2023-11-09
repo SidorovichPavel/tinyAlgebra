@@ -38,6 +38,8 @@ namespace ta
 
 	mat4 transpose(const mat4& mat) noexcept;
 
+	mat4 invert(const mat4& mat) noexcept;
+
 	vec4 operator*(const mat4& mat, const vec4& vec) noexcept;
 	vec4 operator*(const vec4& vec, const mat4& mat) noexcept;
 
