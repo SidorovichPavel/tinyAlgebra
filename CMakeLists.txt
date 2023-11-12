@@ -17,3 +17,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE -march=native -ffast-math)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 export(TARGETS ${PROJECT_NAME} FILE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.cmake)
+
+add_executable(vector_test tests/vector_test.cpp)
+target_link_libraries(vector_test ${PROJECT_NAME})
