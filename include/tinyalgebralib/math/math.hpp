@@ -8,13 +8,77 @@
 
 #include "type_decl.hpp"
 
-
 namespace ta
 {
 	template <class T, size_t Dim>
 	constexpr Vector<T, Dim> normalize(const Vector<T, Dim>& vec) noexcept
 	{
 		return vec / vec.length();
+	}
+
+	template<class T, std::size_t Dim>
+	constexpr Vector<T, Dim> min(const Vector<T, Dim>& vec1, const Vector<T, Dim>& vec2) noexcept {
+		Vector<T, Dim> result;
+		std::transform(vec1.begin(), vec1.end(), vec2.begin(), result.begin(), [](const auto& a, const auto& b) {return std::min(a, b);});
+		return result;
+	}
+
+	template<class T, std::size_t Dim>
+	constexpr Vector<T, Dim> min(const Vector<T, Dim>& vec, const T& val) noexcept {
+		Vector<T, Dim> result;
+		std::transform(vec.begin(), vec.end(), result.begin(), [&val](const auto& a) {return std::min(a, val);});
+		return result;
+	}
+
+	template<class T, std::size_t Dim>
+	constexpr Vector<T, Dim> min(const T& val, const Vector<T, Dim>& vec) noexcept {
+		Vector<T, Dim> result;
+		std::transform(vec.begin(), vec.end(), result.begin(), [&val](const auto& a) {return std::min(a, val);});
+		return result;
+	}
+
+	template<class T, std::size_t Dim>
+	constexpr Vector<T, Dim> max(const Vector<T, Dim>& vec1, const Vector<T, Dim>& vec2) noexcept {
+		Vector<T, Dim> result;
+		std::transform(vec1.begin(), vec1.end(), vec2.begin(), result.begin(), [](const auto& a, const auto& b) {return std::max(a, b);});
+		return result;
+	}
+
+	template<class T, std::size_t Dim>
+	constexpr Vector<T, Dim> max(const Vector<T, Dim>& vec, const T& val) noexcept {
+		Vector<T, Dim> result;
+		std::transform(vec.begin(), vec.end(), result.begin(), [&val](const auto& a) {return std::max(a, val);});
+		return result;
+	}
+
+	template<class T, std::size_t Dim>
+	constexpr Vector<T, Dim> max(const T& val, const Vector<T, Dim>& vec) noexcept {
+		Vector<T, Dim> result;
+		std::transform(vec.begin(), vec.end(), result.begin(), [&val](const auto& a) {return std::max(a, val);});
+		return result;
+	}
+
+	template<class T, std::size_t Dim>
+	constexpr Vector<T, Dim> clamp(const Vector<T, Dim>& val, const Vector<T, Dim>& lo, const Vector<T, Dim>& hi) noexcept {
+		Vector<T, Dim> result;
+		auto vbegin = val.begin();
+		auto vend = val.end();
+		auto lobegin = lo.begin();
+		auto hibegin = hi.begin();
+		auto resbegin = result.begin();
+		for (;vbegin != vend;
+			vbegin++,
+			lobegin++,
+			hibegin++,
+			resbegin++)
+			*resbegin = std::clamp(*vbegin, *lobegin, *hibegin);
+
+		return result;
+	}
+
+	template<class T, std::size_t Dim>
+	constexpr Vector<T, Dim> clamp(const Vector<T, Dim>& val, const T& lo, const T& hi) noexcept {
+		return val.transform_to_new([](const auto& v) {return std::clamp(v, lo, hi);})
 	}
 
 	template <class U, class V>
