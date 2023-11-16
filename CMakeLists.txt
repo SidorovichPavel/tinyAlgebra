@@ -7,7 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCES
     src/math/math.cpp
+    src/math/Vector.cpp
     src/Camera.cpp
+    
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
