@@ -78,7 +78,17 @@ namespace ta
 
 	template<class T, std::size_t Dim>
 	constexpr Vector<T, Dim> clamp(const Vector<T, Dim>& val, const T& lo, const T& hi) noexcept {
-		return val.transform_to_new([](const auto& v) {return std::clamp(v, lo, hi);})
+		return val.transform_to_new([&lo, &hi](const auto& v) {return std::clamp(v, lo, hi);});
+	}
+
+	template<std::size_t Dim>
+	constexpr Vector<float, Dim> ceil(const Vector<float, Dim>& vec) noexcept {
+		return vec.transform_to_new([](auto e) {return std::ceil(e);});
+	}
+
+	template<std::size_t Dim>
+	constexpr Vector<double, Dim> ceil(const Vector<double, Dim>& vec) noexcept {
+		return vec.transform_to_new([](auto e) {return std::ceil(e);});
 	}
 
 	template <class U, class V>
@@ -106,6 +116,17 @@ namespace ta
 
 	vec4 operator*(const mat4& mat, const vec4& vec) noexcept;
 	vec4 operator*(const vec4& vec, const mat4& mat) noexcept;
+
+	template <class T>
+	constexpr T det(Matrix<T, 4, 4> const& m) noexcept
+	{
+		const ta::Matrix<T, 2, 2> A(m(0, 0), m(0, 1), m(1, 0), m(1, 1));
+		const ta::Matrix<T, 2, 2> B(m(0, 2), m(0, 3), m(1, 2), m(1, 3));
+		const ta::Matrix<T, 2, 2> C(m(2, 0), m(2, 1), m(3, 0), m(3, 1));
+		const ta::Matrix<T, 2, 2> D(m(2, 2), m(2, 3), m(3, 2), m(3, 3));
+
+		return det(A - B * inv(D) * C) * det(D);
+	}
 
 	mat4 look_at(vec3 pos, vec3 target, vec3 up) noexcept;
 	mat4 perspective(float fovy, float aspect, float near, float far) noexcept;
