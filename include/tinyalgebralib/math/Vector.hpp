@@ -6,7 +6,6 @@
 #include <functional>
 #include <cmath>
 
-#include <immintrin.h>
 #include <assert.h>
 
 #include "Utility.hpp"
@@ -38,111 +37,90 @@ namespace ta
 		alignas(16) value_type data_[Dim];
 
 	public:
-		constexpr std::pair<iterator, iterator> _get_range() noexcept
-		{
+		constexpr std::pair<iterator, iterator> _get_range() noexcept {
 			return { data_, data_ + Dim };
 		}
 
-		constexpr std::pair<const_iterator, const_iterator> _get_range() const noexcept
-		{
+		constexpr std::pair<const_iterator, const_iterator> _get_range() const noexcept {
 			return { data_, data_ + Dim };
 		}
 
 		template <class Fn>
-		constexpr Vector transform_to_new(Fn&& _Func) const noexcept
-		{
+		constexpr Vector transform_to_new(Fn&& _Func) const noexcept {
 			Vector result;
-			auto [begin, end] = _get_range();
-			auto [rbegin, _] = result._get_range();
-			std::transform(begin, end, rbegin, _Func);
+			std::transform(begin(), end(), result.begin(), _Func);
 			return result;
 		}
 
 	public:
 
-		constexpr Vector() noexcept
-		{
-			auto [begin, end] = _get_range();
-			std::fill(begin, end, static_cast<T>(0));
+		constexpr Vector() noexcept {
+			std::fill(begin(), end(), static_cast<T>(0));
 		}
 
-		constexpr Vector(T val) noexcept
-		{
-			auto [begin, end] = _get_range();
-			std::fill(begin, end, val);
+		constexpr Vector(T val) noexcept {
+			std::fill(begin(), end(), val);
 		}
 
 		template<class U>
-		constexpr Vector(Vector<U, Dim>& other) noexcept
-		{
-			std::copy(other.begin(), other.end(), data_);
+		constexpr Vector(Vector<U, Dim>& other) noexcept {
+			std::copy(other.begin(), other.end(), begin());
 		}
 
 		template<class U>
-		constexpr Vector(const Vector<U, Dim>& other) noexcept
-		{
-			std::copy(other.begin(), other.end(), data_);
+		constexpr Vector(const Vector<U, Dim>& other) noexcept {
+			std::copy(other.begin(), other.end(), begin());
 		}
 
 		template<class U>
-		constexpr Vector(Vector<U, Dim>&& other) noexcept
-		{
-			std::copy(other.begin(), other.end(), data_);
+		constexpr Vector(Vector<U, Dim>&& other) noexcept {
+			std::copy(other.begin(), other.end(), begin());
 		}
 
-		constexpr Vector(std::initializer_list<T> init_list)
-		{
+		Vector(std::initializer_list<T> init_list) noexcept {
 			if (init_list.size() <= Dim)
-				std::copy(init_list.begin(), init_list.end(), data_);
+				std::copy(init_list.begin(), init_list.end(), begin());
 		}
 
 		template<class U, class V>
-		constexpr Vector(Vector<U, (Dim - 1)>& vec, V val) noexcept
-		{
-			auto [other_begin, other_end] = vec._get_range();
-			std::copy(other_begin, other_end, data_);
-			data_[Dim - 1] = static_cast<T>(val);
+		constexpr Vector(Vector<U, (Dim - 1)>& vec, V val) noexcept {
+			auto first = begin();
+			std::copy(vec.begin(), vec.end(), std::ref(first));
+			*first = static_cast<T>(val);
 		}
 
 		template<class U, class V>
-		constexpr Vector(const Vector<U, (Dim - 1)>& vec, V val) noexcept
-		{
-			std::copy(vec.begin(), vec.end(), data_);
-			data_[Dim - 1] = static_cast<T>(val);
+		constexpr Vector(const Vector<U, (Dim - 1)>& vec, V val) noexcept {
+			auto first = begin();
+			std::copy(vec.begin(), vec.end(), std::ref(first));
+			*first = static_cast<T>(val);
 		}
 
 		template<class U, class V>
-		constexpr Vector(Vector<U, (Dim - 1)>&& vec, V val) noexcept
-		{
-			std::copy(vec.begin(), vec.end(), data_);
-			data_[Dim - 1] = static_cast<T>(val);
+		constexpr Vector(Vector<U, (Dim - 1)>&& vec, V val) noexcept {
+			auto first = begin();
+			std::copy(vec.begin(), vec.end(), std::ref(first));
+			*first = static_cast<T>(val);
 		}
 
 		template<class U>
-		constexpr Vector(Vector<U, (Dim + 1)>& vec) noexcept
-		{
-			auto [other_begin, _] = vec._get_range();
-			std::copy_n(other_begin, Dim, data_);
+		constexpr Vector(Vector<U, (Dim + 1)>& vec) noexcept {
+			std::copy_n(vec.begin(), Dim, begin());
 		}
 
 		template<class U>
-		constexpr Vector(const Vector<U, (Dim + 1)>& vec) noexcept
-		{
-			auto [other_begin, _] = vec._get_range();
-			std::copy_n(other_begin, Dim, data_);
+		constexpr Vector(const Vector<U, (Dim + 1)>& vec) noexcept {
+			std::copy_n(vec.begin(), Dim, begin());
 		}
 
 		template<class U>
-		constexpr Vector(Vector<U, (Dim + 1)>&& vec) noexcept
-		{
-			auto [other_begin, _] = vec._get_range();
-			std::copy_n(other_begin, Dim, data_);
+		constexpr Vector(Vector<U, (Dim + 1)>&& vec) noexcept {
+			std::copy_n(vec.begin(), Dim, begin());
 		}
 
 		template <class... Args>
-		constexpr Vector(Args&&...args) noexcept
-		{
-			static_assert(sizeof...(Args) <= Dim, "Too many indices for construct");
+		constexpr Vector(Args&&...args) noexcept {
+			static_assert(sizeof...(Args) == Dim, "Too many indices for construct");
 			static_assert(((std::is_arithmetic_v<
 				std::remove_cvref_t<Args>
 			>) && ...), "Incorrect arguments type");
@@ -151,114 +129,84 @@ namespace ta
 			((*it++ = static_cast<T>(args)), ...);
 		}
 
-		constexpr ~Vector()
-		{		}
+		constexpr ~Vector() {
 
-		static constexpr size_t size() noexcept
-		{
+		}
+
+		static constexpr size_t size() noexcept {
 			return Dim;
 		}
 
 		template <class U>
-		this_type& operator=(const Vector<U, Dim>& right) noexcept
-		{
-			auto [right_begin, right_end] = right._get_range();
-			auto [begin, end] = _get_range();
-			std::copy(right_begin, right_end, begin);
+		this_type& operator=(const Vector<U, Dim>& right) noexcept {
+			std::copy(right.begin(), right.end(), begin());
 			return *this;
 		}
 
 		template <class U>
-		this_type& operator=(Vector<U, Dim>&& right) noexcept
-		{
-			auto [right_begin, right_end] = right._get_range();
-			auto [begin, end] = _get_range();
-			std::copy(right_begin, right_end, begin);
+		this_type& operator=(Vector<U, Dim>&& right) noexcept {
+			std::copy(right.begin(), right.end(), begin());
 			return *this;
 		}
 
-		constexpr this_type operator-() const noexcept
-		{
+		constexpr this_type operator-() const noexcept {
 			return transform_to_new([](auto e)
 				{ return -e; });
 		}
 
-		constexpr this_type operator+() const noexcept
-		{
+		constexpr this_type operator+() const noexcept {
 			return *this;
 		}
 
-		value_ref_type operator[](size_t idx)
-		{
+		value_ref_type operator[](size_t idx) {
 			assert(idx < Dim);
 			return data_[idx];
 		}
 
-		value_type operator[](size_t idx) const
-		{
+		value_type operator[](size_t idx) const {
 			assert(idx < Dim);
 			return data_[idx];
 		}
 
 		template <class U>
-		constexpr this_type& operator+=(const Vector<U, Dim>& right) noexcept
-		{
-			auto [right_begin, right_end] = right._get_range();
-			auto [begin, end] = _get_range();
-			std::transform(right_begin, right_end, begin, begin,
-				[](auto a, auto b)
+		constexpr this_type& operator+=(const Vector<U, Dim>& right) noexcept {
+			std::transform(begin(), end(), right.begin(), begin(), [](auto a, auto b)
 				{ return static_cast<T>(a + b); });
 			return *this;
 		}
 
 		template <class U>
-		constexpr this_type& operator-=(const Vector<U, Dim>& right) noexcept
-		{
-			auto [right_begin, right_end] = right._get_range();
-			auto [begin, end] = _get_range();
-			std::transform(begin, end, right_begin, begin,
-				[](auto a, auto b)
+		constexpr this_type& operator-=(const Vector<U, Dim>& right) noexcept {
+			std::transform(begin(), end(), right.begin(), begin(), [](auto a, auto b)
 				{ return static_cast<T>(a - b); });
 			return *this;
 		}
 
 		template <class U>
-		constexpr this_type& operator+=(const U& right) noexcept
-		{
-			auto [begin, end] = _get_range();
-			std::transform(begin, end, begin,
-				[&](auto a)
+		constexpr this_type& operator+=(const U& right) noexcept {
+			std::transform(begin(), end(), begin(), [&](auto a)
 				{ return static_cast<T>(a + right); });
 			return *this;
 		}
 
 		template <class U>
-		constexpr this_type& operator-=(const U& right) noexcept
-		{
-			auto [begin, end] = _get_range();
-			std::transform(begin, end, begin,
-				[&](auto a)
+		constexpr this_type& operator-=(const U& right) noexcept {
+			std::transform(begin(), end(), begin(), [&](auto a)
 				{ return static_cast<T>(a - right); });
 			return *this;
 		}
 
 		template <class U>
-		constexpr this_type& operator*=(const U& right) noexcept
-		{
-			auto [begin, end] = _get_range();
-			std::transform(begin, end, begin,
-				[&](auto a)
+		constexpr this_type& operator*=(const U& right) noexcept {
+			std::transform(begin(), end(), begin(), [&right](auto a)
 				{ return static_cast<T>(a * right); });
 			return *this;
 		}
 
 		template <class U>
-		constexpr this_type& operator/=(const U& right) noexcept
-		{
+		constexpr this_type& operator/=(const U& right) noexcept {
 			auto rright = 1.f / right;
-			auto [begin, end] = _get_range();
-			std::transform(begin, end, begin,
-				[&](auto a)
+			std::transform(begin(), end(), begin(), [&rright](auto a)
 				{ return static_cast<T>(a * rright); });
 			return *this;
 		}
@@ -268,37 +216,31 @@ namespace ta
 		constexpr const_iterator begin() const noexcept { return data_; }
 		constexpr const_iterator end() const noexcept { return data_ + Dim; }
 
-		constexpr value_type* data() noexcept
-		{
+		constexpr const_iterator cbegin() noexcept { return data_; }
+		constexpr const_iterator cend() noexcept { return data_ + Dim; }
+		constexpr const_iterator cbegin() const noexcept { return data_; }
+		constexpr const_iterator cend() const noexcept { return data_ + Dim; }
+
+		constexpr value_type* data() noexcept {
 			return data_;
 		}
 
-		constexpr const value_type* data() const noexcept
-		{
+		constexpr const value_type* data() const noexcept {
 			return data_;
 		}
 
-		constexpr void* vdata() const noexcept
-		{
-			auto tmp = static_cast<const void*>(data_);
-			return const_cast<void*>(tmp);
-		}
-
-		constexpr float length() const noexcept
-		{
+		constexpr float length() const noexcept {
 			return std::sqrt(static_cast<float>(dot2()));
 		}
 
-		constexpr value_type dot2() const noexcept
-		{
+		constexpr value_type dot2() const noexcept {
 			T res = static_cast<T>(0);
 			for (auto& e : data_)
 				res += e * e;
 			return res;
 		}
 
-		std::string to_string() const
-		{
+		std::string to_string() const {
 			std::string result("{");
 			bool not_first_value = false;
 			for (auto& e : data_)
@@ -315,104 +257,87 @@ namespace ta
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U&, (Dim > 0)> x() noexcept
-		{
+		constexpr detail::enable_if_t<T, U&, (Dim > 0)> x() noexcept {
 			return data_[0];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U, (Dim > 0)> x() const noexcept
-		{
+		constexpr detail::enable_if_t<T, U, (Dim > 0)> x() const noexcept {
 			return data_[0];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U&, (Dim > 1)> y() noexcept
-		{
+		constexpr detail::enable_if_t<T, U&, (Dim > 1)> y() noexcept {
 			return data_[1];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U, (Dim > 1)> y() const noexcept
-		{
+		constexpr detail::enable_if_t<T, U, (Dim > 1)> y() const noexcept {
 			return data_[1];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U&, (Dim > 2)> z() noexcept
-		{
+		constexpr detail::enable_if_t<T, U&, (Dim > 2)> z() noexcept {
 			return data_[2];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U, (Dim > 2)> z() const noexcept
-		{
+		constexpr detail::enable_if_t<T, U, (Dim > 2)> z() const noexcept {
 			return data_[2];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U&, (Dim > 3)> w() noexcept
-		{
+		constexpr detail::enable_if_t<T, U&, (Dim > 3)> w() noexcept {
 			return data_[3];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U, (Dim > 3)> w() const noexcept
-		{
+		constexpr detail::enable_if_t<T, U, (Dim > 3)> w() const noexcept {
 			return data_[3];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U&, (Dim > 0)> r() noexcept
-		{
+		constexpr detail::enable_if_t<T, U&, (Dim > 0)> r() noexcept {
 			return data_[0];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U, (Dim > 0)> r() const noexcept
-		{
+		constexpr detail::enable_if_t<T, U, (Dim > 0)> r() const noexcept {
 			return data_[0];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U&, (Dim > 1)> g() noexcept
-		{
+		constexpr detail::enable_if_t<T, U&, (Dim > 1)> g() noexcept {
 			return data_[1];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U, (Dim > 1)> g() const noexcept
-		{
+		constexpr detail::enable_if_t<T, U, (Dim > 1)> g() const noexcept {
 			return data_[1];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U&, (Dim > 2)> b() noexcept
-		{
+		constexpr detail::enable_if_t<T, U&, (Dim > 2)> b() noexcept {
 			return data_[2];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U, (Dim > 2)> b() const noexcept
-		{
+		constexpr detail::enable_if_t<T, U, (Dim > 2)> b() const noexcept {
 			return data_[2];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U&, (Dim > 3)> a() noexcept
-		{
+		constexpr detail::enable_if_t<T, U&, (Dim > 3)> a() noexcept {
 			return data_[3];
 		}
 
 		template <class U = T>
-		constexpr detail::enable_if_t<T, U, (Dim > 3)> a() const noexcept
-		{
+		constexpr detail::enable_if_t<T, U, (Dim > 3)> a() const noexcept {
 			return data_[3];
 		}
 
 		template <size_t... Indices>
-		constexpr auto swizzle() const noexcept
-		{
+		constexpr auto swizzle() const noexcept {
 			//static_assert(sizeof...(Indices) <= Dim, "Too many indices for swizzle");
 			static_assert(((Indices < Dim) && ...), "Invalid swizzle index");
 
@@ -424,8 +349,7 @@ namespace ta
 	};
 
 	template <class T, class U, size_t Dim>
-	constexpr auto operator+(const Vector<T, Dim>& v, const Vector<U, Dim>& u) noexcept -> Vector<decltype(detail::declval_by_mul<T, U>()), Dim>
-	{
+	constexpr auto operator+(const Vector<T, Dim>& v, const Vector<U, Dim>& u) noexcept -> Vector<decltype(detail::declval_by_mul<T, U>()), Dim> {
 		using return_type = decltype(detail::declval_by_mul<T, U>());
 
 		Vector<return_type, Dim> result;
@@ -440,8 +364,7 @@ namespace ta
 	}
 
 	template <class T, class U, size_t Dim>
-	constexpr auto operator-(const Vector<T, Dim>& v, const Vector<U, Dim>& u) noexcept -> Vector<decltype(detail::declval_by_mul<T, U>()), Dim>
-	{
+	constexpr auto operator-(const Vector<T, Dim>& v, const Vector<U, Dim>& u) noexcept -> Vector<decltype(detail::declval_by_mul<T, U>()), Dim> {
 		using return_type = decltype(detail::declval_by_mul<T, U>());
 
 		Vector<return_type, Dim> result;
@@ -455,52 +378,37 @@ namespace ta
 		return result;
 	}
 
-	constexpr Vector<float, 4> operator+(const Vector<float, 4>& u, const Vector<float, 4>& v) noexcept
-	{
-		Vector<float, 4> result;
-		__m128 uu = _mm_load_ps(u.data());
-		__m128 vv = _mm_load_ps(v.data());
-		__m128 res = _mm_add_ps(vv, uu);
-		_mm_storeu_ps(result.data(), res);
-		return result;
-	}
-
-	constexpr Vector<float, 4> operator-(const Vector<float, 4>& u, const Vector<float, 4>& v) noexcept
-	{
-		Vector<float, 4> result;
-		__m128 uu = _mm_load_ps(u.data());
-		__m128 vv = _mm_load_ps(v.data());
-		__m128 res = _mm_sub_ps(uu, vv);
-		_mm_storeu_ps(result.data(), res);
-		return result;
+	template <class T, class U, size_t Dim>
+	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(const Vector<T, Dim>& vec, U val) noexcept {
+		return vec.transform_to_new([val](auto e)
+			{ return static_cast<T>(val * e); });
 	}
 
 	template <class T, class U, size_t Dim>
-	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(const Vector<T, Dim>& vec, U _Val) noexcept
-	{
-		return vec.transform_to_new([_Val](auto e)
-			{ return static_cast<T>(_Val * e); });
-	}
-
-	template <class T, class U, size_t Dim>
-	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(const Vector<T, Dim>& vec, U _Val) noexcept
-	{
-		auto rval = static_cast<U>(1) / _Val;
+	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(const Vector<T, Dim>& vec, U val) noexcept {
+		auto rval = static_cast<U>(1) / val;
 		return vec.transform_to_new([rval](auto e)
 			{ return static_cast<T>(e * rval); });
 	}
 
 	template <class T, class U, size_t Dim>
-	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(U _Val, const Vector<T, Dim>& vec) noexcept
-	{
-		return vec.transform_to_new([_Val](auto e)
-			{ return static_cast<T>(_Val * e); });
+	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator*(U val, const Vector<T, Dim>& vec) noexcept {
+		return vec.transform_to_new([val](auto e)
+			{ return static_cast<T>(val * e); });
 	}
 
 	template <class T, class U, size_t Dim>
-	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(U _Val, const Vector<T, Dim>& vec) noexcept
-	{
-		return vec.transform_to_new([_Val](auto e)
-			{ return static_cast<T>(_Val / e); });
+	constexpr std::enable_if_t<std::is_arithmetic_v<U>, Vector<T, Dim>> operator/(U val, const Vector<T, Dim>& vec) noexcept {
+		return vec.transform_to_new([val](auto e)
+			{ return static_cast<T>(val / e); });
 	}
+
+	Vector<float, 4> operator+(const Vector<float, 4>& u, const Vector<float, 4>& v) noexcept;
+	Vector<float, 4> operator-(const Vector<float, 4>& u, const Vector<float, 4>& v) noexcept;
+
+	Vector<float, 4> operator*(const Vector<float, 4>& vec, const float val) noexcept;
+	Vector<float, 4> operator*(const float val, const Vector<float, 4>& vec) noexcept;
+	Vector<float, 4> operator/(const Vector<float, 4>& vec, const float val) noexcept;
+	Vector<float, 4> operator/(const float val, const Vector<float, 4>& vec) noexcept;
+
 };
