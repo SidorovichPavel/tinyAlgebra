@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <numbers>
+#include <cstdint>
 
 #include <tinyalgebralib/math/math.hpp>
 
@@ -13,10 +14,10 @@ namespace ta
 	{
 		mat4 result;
 
-		auto b0 = _mm_loadu_ps(B(0));
-		auto b1 = _mm_loadu_ps(B(1));
-		auto b2 = _mm_loadu_ps(B(2));
-		auto b3 = _mm_loadu_ps(B(3));
+		auto b0 = _mm_load_ps(B(0));
+		auto b1 = _mm_load_ps(B(1));
+		auto b2 = _mm_load_ps(B(2));
+		auto b3 = _mm_load_ps(B(3));
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -30,7 +31,7 @@ namespace ta
 			r = _mm_fmadd_ps(ai2, b2, r);
 			r = _mm_fmadd_ps(ai3, b3, r);
 
-			_mm_storeu_ps(result(i), r);
+			_mm_store_ps(result(i), r);
 		}
 
 		return result;
@@ -40,17 +41,17 @@ namespace ta
 	{
 		mat4 result;
 
-		__m128 row1 = _mm_loadu_ps(mat(0));
-		__m128 row2 = _mm_loadu_ps(mat(1));
-		__m128 row3 = _mm_loadu_ps(mat(2));
-		__m128 row4 = _mm_loadu_ps(mat(3));
+		__m128 row1 = _mm_load_ps(mat(0));
+		__m128 row2 = _mm_load_ps(mat(1));
+		__m128 row3 = _mm_load_ps(mat(2));
+		__m128 row4 = _mm_load_ps(mat(3));
 
 		_MM_TRANSPOSE4_PS(row1, row2, row3, row4);
 
-		_mm_storeu_ps(result(0), row1);
-		_mm_storeu_ps(result(1), row2);
-		_mm_storeu_ps(result(2), row3);
-		_mm_storeu_ps(result(3), row4);
+		_mm_store_ps(result(0), row1);
+		_mm_store_ps(result(1), row2);
+		_mm_store_ps(result(2), row3);
+		_mm_store_ps(result(3), row4);
 
 		return result;
 	}
@@ -214,25 +215,28 @@ namespace ta
 		return result;
 	}
 
-	mat4 look_at(vec3 pos, vec3 target, vec3 up) noexcept
+	mat4 look_at(vec3 eye, vec3 center, vec3 up) noexcept
 	{
-		vec3 camera_dir = normalize(pos - target);
-		vec3 camera_right = normalize(cross(up, camera_dir));
-		vec3 camera_up = cross(camera_dir, camera_right);
+		vec3 const f(normalize(center - eye));
+		vec3 const s(normalize(cross(f, up)));
+		vec3 const u(cross(s, f));
 
-		mat4 a({
-			ta::vec4(camera_right, 0.f),
-			ta::vec4(camera_up, 0.f),
-			ta::vec4(camera_dir, 0.f),
-			ta::vec4(0.f, 0.f, 0.f, 1.f)
-			});
+		mat4 Result(1.f);
+		
+		Result(0, 0) = s.x();
+		Result(1, 0) = s.y();
+		Result(2, 0) = s.z();
+		Result(0, 1) = u.x();
+		Result(1, 1) = u.y();
+		Result(2, 1) = u.z();
+		Result(0, 2) = -f.x();
+		Result(1, 2) = -f.y();
+		Result(2, 2) = -f.z();
+		Result(3, 0) = -dot(s, eye);
+		Result(3, 1) = -dot(u, eye);
+		Result(3, 2) = dot(f, eye);
 
-		mat4 b(1.f);
-		b(0, 3) = -pos[0];
-		b(1, 3) = -pos[1];
-		b(2, 3) = -pos[2];
-
-		return a * b;
+		return transpose(Result);
 	}
 
 	float rad(float degs) noexcept
@@ -246,12 +250,12 @@ namespace ta
 		auto ctg_half_fovy = 1.f / std::tan(fovy / 2.f);
 		auto rdist = 1.f / (z_far - z_near);
 
+		//transposed glm RH
 		mat4 result;
-
 		result(0, 0) = ctg_half_fovy / aspect;
 		result(1, 1) = ctg_half_fovy;
-		result(2, 2) = (z_near - z_far) * rdist;
-		result(2, 3) = -2 * z_far * z_near * rdist;
+		result(2, 2) = -(z_far + z_near) * rdist;
+		result(2, 3) = -2.f * z_far * z_near * rdist;
 		result(3, 2) = -1.f;
 
 		return result;
@@ -259,14 +263,13 @@ namespace ta
 
 	mat4 viewport(int32_t xmin, int32_t ymin, int32_t width, int32_t height) noexcept
 	{
-		auto half_width = width / 2.f;
-		auto half_height = height / 2.f;
-		return mat4({
-			 half_width, 0.f, 0.f, xmin + half_width,
+		auto half_width = width * .5f;
+		auto half_height = height * .5f;
+		return mat4(
+			half_width, 0.f, 0.f, xmin + half_width,
 			0.f, -half_height, 0.f, ymin + half_height,
-			0.f,0.f,1.f,0.f,
-			0.f,0.f,0.f,1.f
-			});
+			0.f, 0.f, 0.5f, 0.5f,
+			0.f, 0.f, 0.f, 1.f);
 	}
 
 	mat4 scale(const mat4& mat, const vec3& size) noexcept
