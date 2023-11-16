@@ -45,7 +45,7 @@ namespace ta
 
 		Matrix(const T _Val) noexcept
 		{
-			std::fill(data_, data_ + M * N, static_cast<T>(0));
+			std::fill(begin(), end(), static_cast<T>(0));
 			static_assert(M == N, "Error matrix initialize. Matrix is not quadratic.");
 			for (auto i = 0; i < M; i++)
 				data_[i * N + i] = _Val;
@@ -85,6 +85,40 @@ namespace ta
 			}
 		}
 
+		template <class... Args>
+		Matrix(Args&&...args) noexcept {
+			static_assert(sizeof...(Args) == (M * N), "Too many indices for construct");
+			static_assert(((std::is_arithmetic_v<
+				std::remove_cvref_t<Args>
+			>) && ...), "Incorrect arguments type");
+
+			auto it = begin();
+			((*it++ = static_cast<T>(args)), ...);
+		}
+
+
+		Matrix(Matrix<T, (M - 1), (N - 1)>& other) noexcept {
+			std::fill(begin(), end(), static_cast<T>(0));
+			for (auto&& i : std::views::iota(0u, M - 1u))
+				std::ranges::copy(other[i], (*this)[i].begin());
+			data_[M * N - 1] = 1.f;
+		}
+
+		Matrix(const Matrix<T, (M - 1), (N - 1)>& other) noexcept {
+			std::fill(begin(), end(), static_cast<T>(0));
+			for (auto&& i : std::views::iota(0u, M - 1u))
+				std::ranges::copy(other[i], (*this)[i].begin());
+			data_[M * N - 1] = 1.f;
+		}
+
+		Matrix(Matrix<T, (M - 1), (N - 1)>&& other) noexcept {
+			std::fill(begin(), end(), static_cast<T>(0));
+			for (auto&& i : std::views::iota(0u, M - 1u))
+				std::ranges::copy(other[i], (*this)[i].begin());
+			data_[M * N - 1] = 1.f;
+		}
+
+
 		this_type& operator=(const this_type& _Right) noexcept
 		{
 			std::copy(_Right.begin(), _Right.end(), begin());
@@ -121,6 +155,16 @@ namespace ta
 			return data_[i * N + j];
 		}
 
+		auto operator[](std::size_t i) noexcept {
+			assert(i < M);
+			return std::ranges::subrange(begin() + (i * N), begin() + ((i + 1) * N));
+		}
+
+		auto operator[](std::size_t i) const noexcept {
+			assert(i < M);
+			return std::ranges::subrange(begin() + (i * N), begin() + ((i + 1) * N));
+		}
+
 		value_ref_type at(size_t i, size_t j)
 		{
 			if (i >= M)
@@ -140,7 +184,7 @@ namespace ta
 			return data_;
 		}
 
-		value_type* begin() noexcept
+		iterator begin() noexcept
 		{
 			return data_;
 		}
@@ -148,13 +192,13 @@ namespace ta
 		{
 			return data_;
 		}
-		value_type* end() noexcept
+		iterator end() noexcept
 		{
-			return data_ + M * N;
+			return data_ + (M * N);
 		}
 		const value_type* end() const noexcept
 		{
-			return data_ + M * N;
+			return data_ + (M * N);
 		}
 
 		std::string to_string() const
