@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include <tinyalgebralib/math/math.hpp>
+#include <tinyalgebra/math/math.hpp>
 
 namespace ta
 {

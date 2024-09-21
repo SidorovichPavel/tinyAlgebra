@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include <tinyalgebralib/Camera.hpp>
+#include <tinyalgebra/Camera.hpp>
 
 namespace ta
 {
